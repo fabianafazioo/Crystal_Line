@@ -14,7 +14,7 @@ const url     = require('url');
 // Put your OpenAI API key in a .env file as: OPENAI_API_KEY=sk-...
 // OR paste it directly below (not recommended for shared projects)
 require('./env-loader'); // simple env loader (no npm needed)
-const OPENAI_API_KEY = process.env.OPENAI_API_KEY || 'YOUR_API_KEY_HERE';
+const OPENAI_API_KEY = process.env.example.OPENAI_API_KEY || 'REMOVED';
 const PORT = 3000;
 
 // ── MIME TYPES ───────────────────────────────────────────────────────────────
@@ -180,6 +180,6 @@ server.listen(PORT, () => {
   Open game at:  http://localhost:${PORT}
   API endpoint:  http://localhost:${PORT}/api/questions
   
-  API key loaded: ${OPENAI_API_KEY !== 'YOUR_API_KEY_HERE' ? '✅ Yes' : '❌ No — edit .env file!'}
+  API key loaded: ${OPENAI_API_KEY !== 'REMOVED' ? '✅ Yes' : '❌ No — edit .env.example file!'}
   `);
 });
