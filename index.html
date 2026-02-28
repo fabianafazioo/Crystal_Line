@@ -7,179 +7,163 @@
 <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,400&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root {
-  --fire:#ff4e1a; --water:#00c8ff; --ice:#a8f0ff; --lightning:#ffe033;
-  --earth:#7fff5e; --shadow:#cc44ff; --rune:#ffd700;
-  --bg:#07040f; --bg2:#110820; --panel:rgba(255,255,255,0.04);
-  --border:rgba(255,255,255,0.10); --text:#f0e8ff; --dim:rgba(240,232,255,0.45);
+  --fire:#ff4e1a;--water:#00c8ff;--ice:#a8f0ff;--lightning:#ffe033;
+  --earth:#7fff5e;--shadow:#cc44ff;--rune:#ffd700;
+  --bg:#07040f;--bg2:#110820;--panel:rgba(255,255,255,0.04);
+  --border:rgba(255,255,255,0.10);--text:#f0e8ff;--dim:rgba(240,232,255,0.45);
 }
 *{margin:0;padding:0;box-sizing:border-box;}
 html,body{width:100%;height:100%;overflow:hidden;}
 body{background:var(--bg);color:var(--text);font-family:'Crimson Pro',serif;display:flex;align-items:center;justify-content:center;}
-
 #bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;}
 
 /* ── SCREENS ── */
 .screen{position:fixed;inset:0;z-index:50;display:flex;align-items:center;justify-content:center;background:rgba(7,4,15,0.95);backdrop-filter:blur(18px);transition:opacity .4s,transform .4s;}
-.screen.hidden{opacity:0;pointer-events:none;transform:scale(0.97);}
+.screen.hidden{opacity:0;pointer-events:none;transform:scale(.97);}
 
-/* ── TOPIC SELECTION ── */
-#topic-screen .card{max-width:700px;width:95%;text-align:center;padding:50px 40px;}
+/* ── TOPIC SELECT ── */
+#topic-screen .card{max-width:720px;width:95%;text-align:center;padding:48px 38px;}
 #topic-screen h1{font-family:'Cinzel Decorative',serif;font-size:clamp(1.6rem,4vw,2.8rem);font-weight:900;letter-spacing:.1em;
-  background:linear-gradient(135deg,#ffd700 0%,#ff9a00 40%,#e0c3fc 80%,#96f7d2 100%);
+  background:linear-gradient(135deg,#ffd700,#ff9a00,#e0c3fc,#96f7d2);
   -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
-  filter:drop-shadow(0 0 20px rgba(255,215,0,.5));margin-bottom:8px;}
-#topic-screen .subtitle{font-size:1rem;color:var(--dim);letter-spacing:.25em;text-transform:uppercase;margin-bottom:40px;}
-#topic-screen .how{font-size:.9rem;color:#b8a9d0;line-height:1.8;margin-bottom:36px;max-width:520px;margin-left:auto;margin-right:auto;}
-#topic-screen .how strong{color:#ffd700;}
+  filter:drop-shadow(0 0 20px rgba(255,215,0,.5));margin-bottom:6px;}
+.subtitle{font-family:'Rajdhani',sans-serif;font-size:.9rem;color:var(--dim);letter-spacing:.25em;text-transform:uppercase;margin-bottom:30px;}
+.how{font-size:.92rem;color:#b8a9d0;line-height:1.85;margin-bottom:32px;max-width:540px;margin-left:auto;margin-right:auto;}
+.how strong{color:#ffd700;} .how em{color:#96f7d2;font-style:normal;}
+.how .badge{display:inline-block;background:rgba(255,215,0,.12);border:1px solid rgba(255,215,0,.3);border-radius:6px;padding:1px 7px;font-family:'Rajdhani',sans-serif;font-size:.75rem;color:#ffd700;letter-spacing:.1em;}
 
-.topic-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:14px;margin-bottom:36px;}
-.topic-btn{background:var(--panel);border:1px solid var(--border);border-radius:16px;padding:20px 12px;cursor:pointer;
-  transition:all .25s;display:flex;flex-direction:column;align-items:center;gap:8px;text-decoration:none;}
+.topic-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px;margin-bottom:32px;}
+.topic-btn{background:var(--panel);border:1px solid var(--border);border-radius:16px;padding:18px 10px;cursor:pointer;
+  transition:all .25s;display:flex;flex-direction:column;align-items:center;gap:7px;}
 .topic-btn:hover{border-color:rgba(255,215,0,.5);background:rgba(255,215,0,.06);transform:translateY(-3px);box-shadow:0 8px 24px rgba(255,215,0,.15);}
 .topic-btn.active{border-color:#ffd700;background:rgba(255,215,0,.12);box-shadow:0 0 20px rgba(255,215,0,.3);}
-.topic-icon{font-size:2rem;}
-.topic-name{font-family:'Rajdhani',sans-serif;font-weight:600;font-size:.85rem;letter-spacing:.1em;text-transform:uppercase;color:var(--text);}
-.topic-desc{font-size:.7rem;color:var(--dim);line-height:1.4;}
+.topic-icon{font-size:1.9rem;}
+.topic-name{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:.82rem;letter-spacing:.1em;text-transform:uppercase;}
+.topic-desc{font-size:.68rem;color:var(--dim);line-height:1.4;text-align:center;}
 
-.btn{display:inline-block;padding:13px 36px;border-radius:999px;border:none;cursor:pointer;
-  font-family:'Rajdhani',sans-serif;font-weight:700;font-size:.9rem;letter-spacing:.15em;text-transform:uppercase;
-  transition:transform .2s,box-shadow .2s,filter .2s;}
+/* ── BUTTONS ── */
+.btn{display:inline-block;padding:12px 34px;border-radius:999px;border:none;cursor:pointer;font-family:'Rajdhani',sans-serif;font-weight:700;font-size:.88rem;letter-spacing:.15em;text-transform:uppercase;transition:transform .2s,box-shadow .2s,filter .2s;}
 .btn:hover{transform:scale(1.05);filter:brightness(1.12);}
 .btn:active{transform:scale(.97);}
+.btn:disabled{opacity:.45;pointer-events:none;}
 .btn-gold{background:linear-gradient(135deg,#b8860b,#ffd700,#b8860b);color:#1a1000;box-shadow:0 0 24px rgba(255,215,0,.4);}
 .btn-purple{background:linear-gradient(135deg,#7c3aed,#a855f7);color:#fff;box-shadow:0 0 20px rgba(124,58,237,.5);}
-.btn-ghost{background:transparent;border:1px solid rgba(167,139,250,.4);color:#c4b5fd;padding:10px 24px;}
+.btn-ghost{background:transparent;border:1px solid rgba(167,139,250,.4);color:#c4b5fd;padding:10px 22px;}
 
-/* ── GAME LAYOUT ── */
+/* ── GAME SCREEN ── */
 #game-screen{z-index:10;background:transparent;pointer-events:all;opacity:1;}
 #game-screen.hidden{opacity:0;pointer-events:none;}
-#app{position:relative;z-index:10;display:flex;flex-direction:column;align-items:center;gap:8px;width:100vw;max-width:980px;padding:8px;}
+#app{position:relative;z-index:10;display:flex;flex-direction:column;align-items:center;gap:7px;width:100vw;max-width:990px;padding:7px;}
 
 header{text-align:center;user-select:none;}
-header h1{font-family:'Cinzel Decorative',serif;font-size:clamp(1.1rem,2.5vw,1.8rem);font-weight:900;letter-spacing:.12em;
+header h1{font-family:'Cinzel Decorative',serif;font-size:clamp(1rem,2.4vw,1.7rem);font-weight:900;letter-spacing:.12em;
   background:linear-gradient(135deg,#ffd700,#ff9a00,#e0c3fc,#96f7d2);
   -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
   filter:drop-shadow(0 0 14px rgba(255,215,0,.5));}
-#topic-badge{display:inline-flex;align-items:center;gap:6px;margin-top:3px;
-  font-family:'Rajdhani',sans-serif;font-size:.7rem;letter-spacing:.2em;text-transform:uppercase;
-  color:#ffd700;background:rgba(255,215,0,.08);border:1px solid rgba(255,215,0,.25);
-  border-radius:999px;padding:3px 12px;}
+#topic-badge{display:inline-flex;align-items:center;gap:6px;margin-top:2px;font-family:'Rajdhani',sans-serif;font-size:.68rem;letter-spacing:.2em;text-transform:uppercase;color:#ffd700;background:rgba(255,215,0,.08);border:1px solid rgba(255,215,0,.25);border-radius:999px;padding:2px 12px;}
+#ai-badge{display:inline-flex;align-items:center;gap:5px;margin-left:8px;font-family:'Rajdhani',sans-serif;font-size:.62rem;letter-spacing:.15em;color:#96f7d2;background:rgba(150,247,210,.08);border:1px solid rgba(150,247,210,.25);border-radius:999px;padding:2px 10px;}
+.ai-dot{width:6px;height:6px;border-radius:50%;background:#96f7d2;animation:aipulse 2s infinite;}
+@keyframes aipulse{0%,100%{opacity:1;box-shadow:0 0 4px #96f7d2;}50%{opacity:.3;box-shadow:none;}}
 
 /* HUD */
-#hud{display:flex;gap:10px;align-items:center;justify-content:center;flex-wrap:wrap;width:100%;}
-.hud-card{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:6px 16px;
-  display:flex;flex-direction:column;align-items:center;min-width:72px;backdrop-filter:blur(10px);}
-.hud-label{font-family:'Rajdhani',sans-serif;font-size:.58rem;letter-spacing:.25em;text-transform:uppercase;color:var(--dim);}
-.hud-value{font-family:'Cinzel Decorative',serif;font-size:1.15rem;font-weight:700;color:#e8c6ff;line-height:1;transition:transform .15s;}
+#hud{display:flex;gap:9px;align-items:center;justify-content:center;flex-wrap:wrap;width:100%;}
+.hud-card{background:var(--panel);border:1px solid var(--border);border-radius:11px;padding:5px 14px;display:flex;flex-direction:column;align-items:center;min-width:68px;backdrop-filter:blur(10px);}
+.hud-label{font-family:'Rajdhani',sans-serif;font-size:.56rem;letter-spacing:.25em;text-transform:uppercase;color:var(--dim);}
+.hud-value{font-family:'Cinzel Decorative',serif;font-size:1.1rem;font-weight:700;color:#e8c6ff;line-height:1;transition:transform .15s;}
 .hud-value.pop{transform:scale(1.35);color:#ffd700;}
-#combo-display{font-family:'Rajdhani',sans-serif;font-size:.8rem;letter-spacing:.15em;padding:5px 14px;border-radius:999px;
-  background:linear-gradient(90deg,rgba(255,78,26,.2),rgba(167,139,250,.2));border:1px solid rgba(255,224,51,.3);
-  color:#ffe066;opacity:0;transition:opacity .3s,transform .3s;transform:translateY(4px);}
+#combo-display{font-family:'Rajdhani',sans-serif;font-size:.78rem;letter-spacing:.15em;padding:4px 13px;border-radius:999px;background:linear-gradient(90deg,rgba(255,78,26,.2),rgba(167,139,250,.2));border:1px solid rgba(255,224,51,.3);color:#ffe066;opacity:0;transition:opacity .3s,transform .3s;transform:translateY(4px);}
 #combo-display.visible{opacity:1;transform:translateY(0);}
 
-/* Rune alert bar */
-#rune-alert{display:flex;align-items:center;gap:10px;padding:7px 20px;border-radius:999px;
-  background:linear-gradient(90deg,rgba(255,215,0,.12),rgba(255,150,0,.08));
-  border:1px solid rgba(255,215,0,.35);font-family:'Rajdhani',sans-serif;font-size:.8rem;letter-spacing:.12em;
-  color:#ffd700;opacity:0;transition:opacity .4s;pointer-events:none;}
+/* AI loading + rune alert */
+#status-bar{display:flex;gap:10px;align-items:center;justify-content:center;min-height:28px;}
+#rune-alert{display:flex;align-items:center;gap:8px;padding:5px 18px;border-radius:999px;background:linear-gradient(90deg,rgba(255,215,0,.12),rgba(255,150,0,.08));border:1px solid rgba(255,215,0,.35);font-family:'Rajdhani',sans-serif;font-size:.75rem;letter-spacing:.1em;color:#ffd700;opacity:0;transition:opacity .4s;pointer-events:none;}
 #rune-alert.visible{opacity:1;}
-#rune-alert .pulse{width:8px;height:8px;border-radius:50%;background:#ffd700;box-shadow:0 0 8px #ffd700;animation:blink .8s infinite;}
+.pulse{width:7px;height:7px;border-radius:50%;background:#ffd700;box-shadow:0 0 6px #ffd700;animation:blink .8s infinite;}
 @keyframes blink{0%,100%{opacity:1;}50%{opacity:.2;}}
+#ai-loading{display:flex;align-items:center;gap:8px;padding:5px 18px;border-radius:999px;background:rgba(150,247,210,.07);border:1px solid rgba(150,247,210,.25);font-family:'Rajdhani',sans-serif;font-size:.73rem;letter-spacing:.12em;color:#96f7d2;opacity:0;transition:opacity .4s;pointer-events:none;}
+#ai-loading.visible{opacity:1;}
+.spin{width:10px;height:10px;border:2px solid rgba(150,247,210,.3);border-top-color:#96f7d2;border-radius:50%;animation:spin .7s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
 
 /* Moves bar */
 #moves-bar-wrap{max-width:520px;width:100%;}
-#moves-label{display:flex;justify-content:space-between;font-family:'Rajdhani',sans-serif;font-size:.62rem;color:var(--dim);letter-spacing:.15em;text-transform:uppercase;margin-bottom:4px;}
-#moves-bar-bg{width:100%;height:6px;background:rgba(255,255,255,0.06);border-radius:99px;overflow:hidden;}
-#moves-bar-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,#a78bfa,#60d0ff);box-shadow:0 0 8px rgba(96,208,255,.6);transition:width .4s ease,background .4s;}
+#moves-label{display:flex;justify-content:space-between;font-family:'Rajdhani',sans-serif;font-size:.6rem;color:var(--dim);letter-spacing:.15em;text-transform:uppercase;margin-bottom:4px;}
+#moves-bar-bg{width:100%;height:6px;background:rgba(255,255,255,.06);border-radius:99px;overflow:hidden;}
+#moves-bar-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,#a78bfa,#60d0ff);box-shadow:0 0 8px rgba(96,208,255,.6);transition:width .4s,background .4s;}
 
 /* Game area */
-#game-area{display:flex;gap:12px;align-items:flex-start;justify-content:center;width:100%;}
-.side-panel{background:var(--panel);border:1px solid var(--border);border-radius:16px;padding:12px 10px;width:138px;flex-shrink:0;backdrop-filter:blur(10px);display:flex;flex-direction:column;gap:10px;}
-.side-panel h3{font-family:'Rajdhani',sans-serif;font-size:.6rem;letter-spacing:.22em;text-transform:uppercase;color:var(--dim);text-align:center;border-bottom:1px solid var(--border);padding-bottom:6px;}
-.elem-row{display:flex;align-items:center;gap:7px;font-family:'Rajdhani',sans-serif;font-size:.7rem;color:var(--dim);}
-.elem-dot{width:13px;height:13px;border-radius:50%;flex-shrink:0;}
-
-/* Progress toward next rune */
-#rune-progress-wrap{display:flex;flex-direction:column;gap:4px;}
-#rune-progress-label{font-family:'Rajdhani',sans-serif;font-size:.6rem;letter-spacing:.15em;text-transform:uppercase;color:#ffd700;}
-#rune-progress-bar-bg{width:100%;height:5px;background:rgba(255,215,0,.1);border-radius:99px;overflow:hidden;}
-#rune-progress-bar{height:100%;border-radius:99px;background:linear-gradient(90deg,#b8860b,#ffd700);transition:width .5s ease;width:0%;}
-#rune-count-info{font-family:'Rajdhani',sans-serif;font-size:.62rem;color:var(--dim);}
-
-/* Stats panel */
+#game-area{display:flex;gap:11px;align-items:flex-start;justify-content:center;width:100%;}
+.side-panel{background:var(--panel);border:1px solid var(--border);border-radius:16px;padding:11px 10px;width:136px;flex-shrink:0;backdrop-filter:blur(10px);display:flex;flex-direction:column;gap:9px;}
+.side-panel h3{font-family:'Rajdhani',sans-serif;font-size:.58rem;letter-spacing:.22em;text-transform:uppercase;color:var(--dim);text-align:center;border-bottom:1px solid var(--border);padding-bottom:5px;}
+.elem-row{display:flex;align-items:center;gap:6px;font-family:'Rajdhani',sans-serif;font-size:.68rem;color:var(--dim);}
+.elem-dot{width:12px;height:12px;border-radius:50%;flex-shrink:0;}
 .stat-row{display:flex;justify-content:space-between;align-items:center;}
-.stat-key{font-family:'Rajdhani',sans-serif;font-size:.62rem;color:var(--dim);letter-spacing:.08em;}
-.stat-val{font-family:'Rajdhani',sans-serif;font-size:.78rem;color:#c4b5fd;font-weight:600;}
+.stat-key{font-family:'Rajdhani',sans-serif;font-size:.6rem;color:var(--dim);letter-spacing:.06em;}
+.stat-val{font-family:'Rajdhani',sans-serif;font-size:.75rem;color:#c4b5fd;font-weight:600;}
 .stat-val.gold{color:#ffd700;}
+
+/* Rune progress */
+#rune-progress-wrap{display:flex;flex-direction:column;gap:3px;}
+#rune-progress-label{font-family:'Rajdhani',sans-serif;font-size:.58rem;letter-spacing:.15em;text-transform:uppercase;color:#ffd700;}
+#rune-bar-bg{width:100%;height:5px;background:rgba(255,215,0,.1);border-radius:99px;overflow:hidden;}
+#rune-bar-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,#b8860b,#ffd700);transition:width .5s;}
+#rune-count-info{font-family:'Rajdhani',sans-serif;font-size:.58rem;color:var(--dim);}
 
 /* Canvas */
 #canvas-wrapper{position:relative;flex-shrink:0;border-radius:18px;overflow:hidden;
-  box-shadow:0 0 0 1px rgba(255,255,255,0.07),0 0 50px rgba(100,60,180,.35),0 0 100px rgba(60,20,120,.25),inset 0 0 40px rgba(0,0,0,.5);}
+  box-shadow:0 0 0 1px rgba(255,255,255,.07),0 0 50px rgba(100,60,180,.35),inset 0 0 40px rgba(0,0,0,.5);}
 #canvas-wrapper::before{content:'';position:absolute;inset:0;border-radius:18px;border:1px solid rgba(255,215,0,.15);pointer-events:none;z-index:20;}
 #game-canvas{display:block;cursor:pointer;border-radius:18px;}
 #particle-canvas{position:absolute;inset:0;pointer-events:none;border-radius:18px;z-index:15;}
 
-/* Bottom strip */
-#level-strip{display:flex;gap:14px;align-items:center;justify-content:center;font-family:'Rajdhani',sans-serif;font-size:.68rem;color:var(--dim);letter-spacing:.18em;text-transform:uppercase;}
+/* Level strip */
+#level-strip{display:flex;gap:12px;align-items:center;justify-content:center;font-family:'Rajdhani',sans-serif;font-size:.66rem;color:var(--dim);letter-spacing:.18em;text-transform:uppercase;}
 #level-strip span{color:#c4b5fd;font-weight:600;}
 #level-strip .gold{color:#ffd700;}
 
 /* ── QUESTION OVERLAY ── */
-#question-overlay{position:fixed;inset:0;z-index:200;display:flex;align-items:center;justify-content:center;
-  background:rgba(7,4,15,.92);backdrop-filter:blur(20px);opacity:0;pointer-events:none;transition:opacity .35s;}
+#question-overlay{position:fixed;inset:0;z-index:200;display:flex;align-items:center;justify-content:center;background:rgba(7,4,15,.93);backdrop-filter:blur(22px);opacity:0;pointer-events:none;transition:opacity .35s;}
 #question-overlay.active{opacity:1;pointer-events:all;}
-.q-card{background:linear-gradient(135deg,rgba(30,12,60,.98),rgba(10,6,20,.99));
-  border:1px solid rgba(255,215,0,.3);border-radius:24px;padding:40px 44px;text-align:center;max-width:480px;width:92%;
-  box-shadow:0 0 80px rgba(255,215,0,.2),0 0 160px rgba(100,60,180,.3);
-  transform:scale(.92);transition:transform .35s;}
+.q-card{background:linear-gradient(135deg,rgba(30,12,60,.99),rgba(10,6,20,1));border:1px solid rgba(255,215,0,.3);border-radius:24px;padding:36px 42px;text-align:center;max-width:500px;width:93%;box-shadow:0 0 80px rgba(255,215,0,.2),0 0 160px rgba(100,60,180,.3);transform:scale(.92);transition:transform .35s;}
 #question-overlay.active .q-card{transform:scale(1);}
-.q-rune-display{width:72px;height:72px;border-radius:50%;margin:0 auto 18px;display:flex;align-items:center;justify-content:center;
-  font-family:'Cinzel Decorative',serif;font-size:1.8rem;font-weight:900;color:#1a1000;
-  background:radial-gradient(circle at 35% 30%,#ffe88a,#ffd700 55%,#b8860b);
-  box-shadow:0 0 30px rgba(255,215,0,.6),0 0 60px rgba(255,215,0,.3);}
-.q-card h3{font-family:'Cinzel Decorative',serif;font-size:1rem;letter-spacing:.1em;color:#ffd700;margin-bottom:6px;}
-.q-topic-badge{font-family:'Rajdhani',sans-serif;font-size:.65rem;letter-spacing:.2em;text-transform:uppercase;
-  color:var(--dim);margin-bottom:18px;display:block;}
-.q-question{font-size:1.1rem;color:var(--text);line-height:1.65;margin-bottom:24px;font-style:italic;}
-.q-choices{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px;}
-.q-choice{background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:12px;padding:12px 10px;
-  cursor:pointer;font-family:'Rajdhani',sans-serif;font-size:.85rem;font-weight:600;letter-spacing:.05em;
-  color:var(--text);transition:all .2s;text-align:left;}
-.q-choice:hover{border-color:rgba(255,215,0,.4);background:rgba(255,215,0,.07);color:#ffd700;}
-.q-choice.correct{border-color:#7fff5e;background:rgba(127,255,94,.12);color:#7fff5e;pointer-events:none;}
-.q-choice.wrong{border-color:#ff4e1a;background:rgba(255,78,26,.1);color:#ff4e1a;pointer-events:none;}
-.q-choice.reveal{border-color:#7fff5e;background:rgba(127,255,94,.08);color:#7fff5e;pointer-events:none;}
-.q-feedback{font-family:'Rajdhani',sans-serif;font-size:.85rem;letter-spacing:.1em;min-height:22px;margin-bottom:10px;}
-.q-feedback.good{color:#7fff5e;}
-.q-feedback.bad{color:#ff4e1a;}
+.q-rune-display{width:70px;height:70px;border-radius:50%;margin:0 auto 16px;display:flex;align-items:center;justify-content:center;font-family:'Rajdhani',sans-serif;font-size:1.3rem;font-weight:700;color:#1a1000;background:radial-gradient(circle at 35% 30%,#ffe88a,#ffd700 55%,#b8860b);box-shadow:0 0 30px rgba(255,215,0,.6);}
+.q-card h3{font-family:'Cinzel Decorative',serif;font-size:.95rem;letter-spacing:.1em;color:#ffd700;margin-bottom:4px;}
+.q-meta{display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:16px;}
+.q-topic-badge{font-family:'Rajdhani',sans-serif;font-size:.62rem;letter-spacing:.18em;text-transform:uppercase;color:var(--dim);}
+.q-diff-badge{font-family:'Rajdhani',sans-serif;font-size:.62rem;letter-spacing:.12em;padding:2px 9px;border-radius:999px;border:1px solid;font-weight:600;}
 .q-timer-bar-bg{width:100%;height:5px;background:rgba(255,255,255,.08);border-radius:99px;overflow:hidden;margin-bottom:16px;}
-.q-timer-bar{height:100%;border-radius:99px;background:linear-gradient(90deg,#ffd700,#ff9a00);transition:width .1s linear;width:100%;}
-.q-stakes{font-family:'Rajdhani',sans-serif;font-size:.7rem;color:var(--dim);margin-bottom:16px;}
+.q-timer-bar{height:100%;border-radius:99px;background:linear-gradient(90deg,#ffd700,#ff9a00);transition:width .1s linear;}
+.q-question{font-size:1.08rem;color:var(--text);line-height:1.7;margin-bottom:22px;font-style:italic;}
+.q-choices{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:16px;}
+.q-choice{background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:12px;padding:11px 9px;cursor:pointer;font-family:'Rajdhani',sans-serif;font-size:.83rem;font-weight:600;letter-spacing:.04em;color:var(--text);transition:all .2s;text-align:left;line-height:1.4;}
+.q-choice:hover:not(:disabled){border-color:rgba(255,215,0,.4);background:rgba(255,215,0,.07);color:#ffd700;}
+.q-choice.correct{border-color:#7fff5e!important;background:rgba(127,255,94,.12)!important;color:#7fff5e!important;pointer-events:none;}
+.q-choice.wrong{border-color:#ff4e1a!important;background:rgba(255,78,26,.1)!important;color:#ff4e1a!important;pointer-events:none;}
+.q-choice.reveal{border-color:#7fff5e!important;background:rgba(127,255,94,.07)!important;color:#7fff5e!important;pointer-events:none;}
+.q-feedback{font-family:'Rajdhani',sans-serif;font-size:.82rem;letter-spacing:.1em;min-height:20px;margin-bottom:8px;}
+.q-feedback.good{color:#7fff5e;} .q-feedback.bad{color:#ff4e1a;}
+.q-explanation{font-size:.78rem;color:var(--dim);font-style:italic;min-height:18px;line-height:1.5;margin-bottom:8px;}
+.q-stakes{font-family:'Rajdhani',sans-serif;font-size:.68rem;color:var(--dim);}
 .q-stakes .good{color:#7fff5e;} .q-stakes .bad{color:#ff4e1a;}
+.q-source{font-family:'Rajdhani',sans-serif;font-size:.6rem;color:rgba(150,247,210,.4);margin-top:6px;letter-spacing:.1em;}
 
-/* ── GENERIC OVERLAYS ── */
-.overlay{position:fixed;inset:0;z-index:100;display:flex;align-items:center;justify-content:center;
-  background:rgba(5,2,14,.88);backdrop-filter:blur(16px);opacity:0;pointer-events:none;transition:opacity .4s;}
+/* ── OVERLAYS ── */
+.overlay{position:fixed;inset:0;z-index:100;display:flex;align-items:center;justify-content:center;background:rgba(5,2,14,.88);backdrop-filter:blur(16px);opacity:0;pointer-events:none;transition:opacity .4s;}
 .overlay.active{opacity:1;pointer-events:all;}
-.overlay-card{background:linear-gradient(135deg,rgba(30,12,60,.95),rgba(10,6,20,.98));border:1px solid rgba(167,139,250,.3);
-  border-radius:24px;padding:42px 46px;text-align:center;max-width:420px;width:90%;
-  box-shadow:0 0 80px rgba(100,60,180,.5);transform:translateY(20px);transition:transform .4s;}
+.overlay-card{background:linear-gradient(135deg,rgba(30,12,60,.95),rgba(10,6,20,.98));border:1px solid rgba(167,139,250,.3);border-radius:24px;padding:40px 44px;text-align:center;max-width:420px;width:90%;box-shadow:0 0 80px rgba(100,60,180,.5);transform:translateY(20px);transition:transform .4s;}
 .overlay.active .overlay-card{transform:translateY(0);}
-.overlay-card h2{font-family:'Cinzel Decorative',serif;font-size:1.7rem;
-  background:linear-gradient(135deg,#ffd700,#ff9a00,#e0c3fc);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:10px;}
-.overlay-card p{color:var(--dim);font-size:.88rem;letter-spacing:.08em;line-height:1.75;margin-bottom:8px;}
-.big-score{font-family:'Cinzel Decorative',serif;font-size:2.8rem;color:#ffd700;filter:drop-shadow(0 0 18px rgba(255,215,0,.6));margin:14px 0;display:block;}
-.stars-row{display:flex;justify-content:center;gap:10px;margin:12px 0;}
-.star{font-size:1.9rem;opacity:.2;transition:opacity .3s,transform .3s;transition-delay:var(--d,0s);}
+.overlay-card h2{font-family:'Cinzel Decorative',serif;font-size:1.65rem;background:linear-gradient(135deg,#ffd700,#ff9a00,#e0c3fc);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:8px;}
+.overlay-card p{color:var(--dim);font-size:.86rem;line-height:1.75;margin-bottom:6px;}
+.big-score{font-family:'Cinzel Decorative',serif;font-size:2.7rem;color:#ffd700;filter:drop-shadow(0 0 18px rgba(255,215,0,.6));margin:12px 0;display:block;}
+.stars-row{display:flex;justify-content:center;gap:9px;margin:10px 0;}
+.star{font-size:1.8rem;opacity:.2;transition:opacity .3s,transform .3s;transition-delay:var(--d,0s);}
 .star.lit{opacity:1;transform:scale(1.2) rotate(8deg);}
-.score-breakdown{display:flex;flex-direction:column;gap:5px;margin:14px 0;font-family:'Rajdhani',sans-serif;font-size:.8rem;}
+.score-breakdown{display:flex;flex-direction:column;gap:4px;margin:12px 0;font-family:'Rajdhani',sans-serif;font-size:.78rem;}
 .breakdown-row{display:flex;justify-content:space-between;padding:4px 10px;border-radius:8px;background:rgba(255,255,255,.03);}
-.breakdown-row .label{color:var(--dim);}
-.breakdown-row .val{color:#ffd700;font-weight:600;}
+.breakdown-row .label{color:var(--dim);} .breakdown-row .val{color:#ffd700;font-weight:600;}
 
 /* Score popup */
-.score-popup{position:fixed;pointer-events:none;font-family:'Rajdhani',sans-serif;font-weight:700;font-size:1rem;
-  text-shadow:0 0 10px currentColor;animation:floatUp 1.1s forwards ease-out;z-index:300;white-space:nowrap;}
+.score-popup{position:fixed;pointer-events:none;font-family:'Rajdhani',sans-serif;font-weight:700;font-size:1rem;text-shadow:0 0 10px currentColor;animation:floatUp 1.1s forwards ease-out;z-index:300;white-space:nowrap;}
 @keyframes floatUp{0%{opacity:1;transform:translateY(0) scale(1);}60%{opacity:1;transform:translateY(-40px) scale(1.1);}100%{opacity:0;transform:translateY(-70px) scale(.9);}}
 
 @media(max-width:720px){.side-panel{display:none;}#game-area{flex-direction:column;align-items:center;}}
@@ -188,25 +172,28 @@ header h1{font-family:'Cinzel Decorative',serif;font-size:clamp(1.1rem,2.5vw,1.8
 <body>
 <canvas id="bg-canvas"></canvas>
 
-<!-- ── TOPIC SELECTION SCREEN ── -->
+<!-- TOPIC SELECT -->
 <div class="screen" id="topic-screen">
   <div class="card">
     <h1>✦ Crystalline ✦</h1>
     <div class="subtitle">Elemental Knowledge Puzzle</div>
     <div class="how">
-      Match gems to score points. As you progress, <strong>Rune Gems ✦</strong> appear on the board — each branded with an abbreviation from your chosen topic. Match a Rune Gem to unlock a question. <strong>Answer correctly</strong> for massive bonus points &amp; extra moves. <strong>Answer wrong</strong> and lose moves. The higher the level, the harder the questions and the more Runes appear!
+      Match gems to score points — including <em>diagonals</em>! As you progress, <strong>Rune Gems ✦</strong> appear branded with an abbreviation. Match one to unlock a quiz question powered by <span class="badge">✦ AI</span>. Questions get harder every level and are <strong>never the same twice</strong>. Answer correctly for bonus points and extra moves!
     </div>
     <div class="topic-grid" id="topic-grid"></div>
     <button class="btn btn-gold" onclick="confirmTopic()" id="start-btn" disabled>Choose a Topic to Begin ✦</button>
   </div>
 </div>
 
-<!-- ── GAME SCREEN ── -->
+<!-- GAME SCREEN -->
 <div class="screen hidden" id="game-screen">
 <div id="app">
   <header>
     <h1>✦ Crystalline ✦</h1>
-    <div id="topic-badge"></div>
+    <div style="display:flex;align-items:center;justify-content:center;gap:6px;margin-top:3px;">
+      <div id="topic-badge"></div>
+      <div id="ai-badge"><div class="ai-dot"></div>AI Questions</div>
+    </div>
   </header>
 
   <div id="hud">
@@ -217,7 +204,10 @@ header h1{font-family:'Cinzel Decorative',serif;font-size:clamp(1.1rem,2.5vw,1.8
     <div id="combo-display">🔥 COMBO x<span id="combo-num">0</span></div>
   </div>
 
-  <div id="rune-alert"><div class="pulse"></div><span id="rune-alert-text">A Rune Gem has appeared! Match it to unlock a question!</span></div>
+  <div id="status-bar">
+    <div id="ai-loading"><div class="spin"></div><span id="ai-loading-text">Generating questions…</span></div>
+    <div id="rune-alert"><div class="pulse"></div><span id="rune-alert-text">A Rune Gem appeared!</span></div>
+  </div>
 
   <div id="moves-bar-wrap">
     <div id="moves-label"><span>Moves Remaining</span><span id="moves-count">20 / 20</span></div>
@@ -227,7 +217,7 @@ header h1{font-family:'Cinzel Decorative',serif;font-size:clamp(1.1rem,2.5vw,1.8
   <div id="game-area">
     <div class="side-panel">
       <h3>Elements</h3>
-      <div style="display:flex;flex-direction:column;gap:5px;">
+      <div style="display:flex;flex-direction:column;gap:4px;">
         <div class="elem-row"><div class="elem-dot" style="background:#ff4e1a"></div>Fire 🔥</div>
         <div class="elem-row"><div class="elem-dot" style="background:#00c8ff"></div>Water 💧</div>
         <div class="elem-row"><div class="elem-dot" style="background:#a8f0ff"></div>Ice ❄️</div>
@@ -235,12 +225,12 @@ header h1{font-family:'Cinzel Decorative',serif;font-size:clamp(1.1rem,2.5vw,1.8
         <div class="elem-row"><div class="elem-dot" style="background:#7fff5e"></div>Earth 🌿</div>
         <div class="elem-row"><div class="elem-dot" style="background:#cc44ff"></div>Shadow 🔮</div>
       </div>
-      <h3 style="margin-top:4px;">Rune ✦</h3>
-      <div class="elem-row"><div class="elem-dot" style="background:#ffd700;box-shadow:0 0 6px #ffd700"></div><span style="color:#ffd700;font-size:.68rem;">Knowledge Gem</span></div>
-      <div style="font-size:.62rem;color:var(--dim);line-height:1.5;">Match rune gems to trigger a quiz question!</div>
+      <h3>Rune ✦</h3>
+      <div class="elem-row"><div class="elem-dot" style="background:#ffd700;box-shadow:0 0 6px #ffd700"></div><span style="color:#ffd700;font-size:.66rem;">Knowledge Gem</span></div>
+      <div style="font-size:.6rem;color:var(--dim);line-height:1.5;">Match rune gems to trigger an AI quiz!</div>
       <div id="rune-progress-wrap">
         <div id="rune-progress-label">Next Rune</div>
-        <div id="rune-progress-bar-bg"><div id="rune-progress-bar"></div></div>
+        <div id="rune-bar-bg"><div id="rune-bar-fill"></div></div>
         <div id="rune-count-info"></div>
       </div>
     </div>
@@ -252,9 +242,13 @@ header h1{font-family:'Cinzel Decorative',serif;font-size:clamp(1.1rem,2.5vw,1.8
 
     <div class="side-panel">
       <h3>Difficulty</h3>
-      <div id="difficulty-panel" style="display:flex;flex-direction:column;gap:6px;"></div>
+      <div id="difficulty-panel" style="display:flex;flex-direction:column;gap:5px;"></div>
+      <h3 style="margin-top:4px;">Match Types</h3>
+      <div style="font-size:.6rem;color:var(--dim);line-height:1.7;">
+        ↔ Horizontal<br>↕ Vertical<br>↗ Diagonal /<br>↘ Diagonal \<br>✦ Cross (5+)<br>🔥 Reactions
+      </div>
       <h3 style="margin-top:4px;">Stats</h3>
-      <div style="display:flex;flex-direction:column;gap:5px;">
+      <div style="display:flex;flex-direction:column;gap:4px;">
         <div class="stat-row"><span class="stat-key">Questions</span><span class="stat-val" id="stat-q">0</span></div>
         <div class="stat-row"><span class="stat-key">Correct</span><span class="stat-val gold" id="stat-c">0</span></div>
         <div class="stat-row"><span class="stat-key">Accuracy</span><span class="stat-val" id="stat-a">—</span></div>
@@ -264,56 +258,54 @@ header h1{font-family:'Cinzel Decorative',serif;font-size:clamp(1.1rem,2.5vw,1.8
   </div>
 
   <div id="level-strip">
-    Target: <span id="target-display">500</span> pts &nbsp;|&nbsp;
-    Runes on board: <span class="gold" id="runes-on-board">0</span> &nbsp;|&nbsp;
-    <span id="objective-display">Get 500 points!</span>
+    Target: <span id="target-display">600</span> pts &nbsp;|&nbsp;
+    Runes: <span class="gold" id="runes-on-board">0</span> &nbsp;|&nbsp;
+    <span id="objective-display">Novice</span>
   </div>
 </div>
 </div>
 
-<!-- ── QUESTION OVERLAY ── -->
+<!-- QUESTION OVERLAY -->
 <div id="question-overlay">
   <div class="q-card">
     <div class="q-rune-display" id="q-rune-letter">?</div>
     <h3>Rune Challenge ✦</h3>
-    <span class="q-topic-badge" id="q-topic-name"></span>
+    <div class="q-meta">
+      <span class="q-topic-badge" id="q-topic-name"></span>
+      <span class="q-diff-badge" id="q-diff-badge"></span>
+    </div>
     <div class="q-timer-bar-bg"><div class="q-timer-bar" id="q-timer-bar"></div></div>
     <div class="q-question" id="q-question-text"></div>
     <div class="q-choices" id="q-choices"></div>
     <div class="q-feedback" id="q-feedback"></div>
-    <div class="q-stakes">
-      ✅ Correct: <span class="good">+<span id="q-bonus">500</span> pts + 2 moves</span> &nbsp;|&nbsp;
-      ❌ Wrong: <span class="bad">−2 moves</span>
-    </div>
+    <div class="q-explanation" id="q-explanation"></div>
+    <div class="q-stakes">✅ Correct: <span class="good">+<span id="q-bonus">500</span> pts &amp; +2 moves</span> &nbsp;|&nbsp; ❌ Wrong: <span class="bad">−<span id="q-penalty">2</span> moves</span></div>
+    <div class="q-source" id="q-source"></div>
   </div>
 </div>
 
-<!-- ── LEVEL COMPLETE ── -->
+<!-- LEVEL COMPLETE -->
 <div class="overlay" id="level-overlay">
   <div class="overlay-card">
     <h2 id="level-title">Level Complete!</h2>
-    <div class="stars-row">
-      <span class="star" style="--d:0s">⭐</span>
-      <span class="star" style="--d:.15s">⭐</span>
-      <span class="star" style="--d:.3s">⭐</span>
-    </div>
+    <div class="stars-row"><span class="star" style="--d:0s">⭐</span><span class="star" style="--d:.15s">⭐</span><span class="star" style="--d:.3s">⭐</span></div>
     <span class="big-score" id="level-score">0</span>
     <div class="score-breakdown" id="score-breakdown"></div>
     <p id="level-feedback"></p>
-    <button class="btn btn-gold" onclick="nextLevel()" style="margin-top:16px;">Next Level ➤</button>
-    <button class="btn btn-ghost" onclick="restartGame()" style="margin-left:10px;margin-top:16px;">Restart</button>
+    <button class="btn btn-gold" onclick="nextLevel()" style="margin-top:14px;">Next Level ➤</button>
+    <button class="btn btn-ghost" onclick="restartGame()" style="margin-left:8px;margin-top:14px;">Restart</button>
   </div>
 </div>
 
-<!-- ── GAME OVER ── -->
+<!-- GAME OVER -->
 <div class="overlay" id="gameover-overlay">
   <div class="overlay-card">
     <h2>Game Over</h2>
     <span class="big-score" id="final-score">0</span>
     <div class="score-breakdown" id="go-breakdown"></div>
     <p id="gameover-feedback"></p>
-    <button class="btn btn-purple" onclick="restartGame()" style="margin-top:16px;">Play Again ✦</button>
-    <button class="btn btn-ghost" onclick="goToTopicSelect()" style="margin-left:10px;margin-top:16px;">Change Topic</button>
+    <button class="btn btn-purple" onclick="restartGame()" style="margin-top:14px;">Play Again ✦</button>
+    <button class="btn btn-ghost" onclick="goToTopicSelect()" style="margin-left:8px;margin-top:14px;">Change Topic</button>
   </div>
 </div>
 
