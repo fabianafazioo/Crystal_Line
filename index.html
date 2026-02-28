@@ -3,530 +3,317 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>✨ Crystalline — Elemental Gem Puzzle</title>
-<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&family=Raleway:wght@300;400;500;600&display=swap" rel="stylesheet">
+<title>✦ Crystalline — Elemental Knowledge Puzzle</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,400&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --fire:   #ff4e1a;
-    --water:  #00c8ff;
-    --ice:    #a8f0ff;
-    --lightning: #ffe033;
-    --earth:  #7fff5e;
-    --shadow: #cc44ff;
-    --bg-deep: #0a0612;
-    --bg-mid:  #130924;
-    --panel:   rgba(255,255,255,0.04);
-    --border:  rgba(255,255,255,0.10);
-    --text:    #f0e8ff;
-    --text-dim: rgba(240,232,255,0.45);
-    --glow-size: 18px;
-  }
+:root {
+  --fire:#ff4e1a; --water:#00c8ff; --ice:#a8f0ff; --lightning:#ffe033;
+  --earth:#7fff5e; --shadow:#cc44ff; --rune:#ffd700;
+  --bg:#07040f; --bg2:#110820; --panel:rgba(255,255,255,0.04);
+  --border:rgba(255,255,255,0.10); --text:#f0e8ff; --dim:rgba(240,232,255,0.45);
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{width:100%;height:100%;overflow:hidden;}
+body{background:var(--bg);color:var(--text);font-family:'Crimson Pro',serif;display:flex;align-items:center;justify-content:center;}
 
-  * { margin:0; padding:0; box-sizing:border-box; }
+#bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;}
 
-  body {
-    background: var(--bg-deep);
-    color: var(--text);
-    font-family: 'Raleway', sans-serif;
-    min-height: 100vh;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    position: relative;
-  }
+/* ── SCREENS ── */
+.screen{position:fixed;inset:0;z-index:50;display:flex;align-items:center;justify-content:center;background:rgba(7,4,15,0.95);backdrop-filter:blur(18px);transition:opacity .4s,transform .4s;}
+.screen.hidden{opacity:0;pointer-events:none;transform:scale(0.97);}
 
-  /* ── Animated starfield background ── */
-  #bg-canvas {
-    position: fixed;
-    inset: 0;
-    z-index: 0;
-    pointer-events: none;
-  }
+/* ── TOPIC SELECTION ── */
+#topic-screen .card{max-width:700px;width:95%;text-align:center;padding:50px 40px;}
+#topic-screen h1{font-family:'Cinzel Decorative',serif;font-size:clamp(1.6rem,4vw,2.8rem);font-weight:900;letter-spacing:.1em;
+  background:linear-gradient(135deg,#ffd700 0%,#ff9a00 40%,#e0c3fc 80%,#96f7d2 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  filter:drop-shadow(0 0 20px rgba(255,215,0,.5));margin-bottom:8px;}
+#topic-screen .subtitle{font-size:1rem;color:var(--dim);letter-spacing:.25em;text-transform:uppercase;margin-bottom:40px;}
+#topic-screen .how{font-size:.9rem;color:#b8a9d0;line-height:1.8;margin-bottom:36px;max-width:520px;margin-left:auto;margin-right:auto;}
+#topic-screen .how strong{color:#ffd700;}
 
-  /* ── Layout ── */
-  #app {
-    position: relative;
-    z-index: 10;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 10px;
-    width: 100vw;
-    max-width: 960px;
-    padding: 10px;
-  }
+.topic-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:14px;margin-bottom:36px;}
+.topic-btn{background:var(--panel);border:1px solid var(--border);border-radius:16px;padding:20px 12px;cursor:pointer;
+  transition:all .25s;display:flex;flex-direction:column;align-items:center;gap:8px;text-decoration:none;}
+.topic-btn:hover{border-color:rgba(255,215,0,.5);background:rgba(255,215,0,.06);transform:translateY(-3px);box-shadow:0 8px 24px rgba(255,215,0,.15);}
+.topic-btn.active{border-color:#ffd700;background:rgba(255,215,0,.12);box-shadow:0 0 20px rgba(255,215,0,.3);}
+.topic-icon{font-size:2rem;}
+.topic-name{font-family:'Rajdhani',sans-serif;font-weight:600;font-size:.85rem;letter-spacing:.1em;text-transform:uppercase;color:var(--text);}
+.topic-desc{font-size:.7rem;color:var(--dim);line-height:1.4;}
 
-  /* ── Header ── */
-  header {
-    text-align: center;
-    user-select: none;
-  }
-  header h1 {
-    font-family: 'Cinzel Decorative', serif;
-    font-size: clamp(1.4rem, 3.5vw, 2.4rem);
-    font-weight: 900;
-    letter-spacing: 0.12em;
-    background: linear-gradient(135deg, #e8c6ff 0%, #a78bfa 40%, #60d0ff 80%, #ffe066 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    filter: drop-shadow(0 0 20px rgba(167,139,250,0.6));
-    text-transform: uppercase;
-  }
-  header p {
-    font-size: 0.75rem;
-    letter-spacing: 0.3em;
-    color: var(--text-dim);
-    text-transform: uppercase;
-    margin-top: 2px;
-  }
+.btn{display:inline-block;padding:13px 36px;border-radius:999px;border:none;cursor:pointer;
+  font-family:'Rajdhani',sans-serif;font-weight:700;font-size:.9rem;letter-spacing:.15em;text-transform:uppercase;
+  transition:transform .2s,box-shadow .2s,filter .2s;}
+.btn:hover{transform:scale(1.05);filter:brightness(1.12);}
+.btn:active{transform:scale(.97);}
+.btn-gold{background:linear-gradient(135deg,#b8860b,#ffd700,#b8860b);color:#1a1000;box-shadow:0 0 24px rgba(255,215,0,.4);}
+.btn-purple{background:linear-gradient(135deg,#7c3aed,#a855f7);color:#fff;box-shadow:0 0 20px rgba(124,58,237,.5);}
+.btn-ghost{background:transparent;border:1px solid rgba(167,139,250,.4);color:#c4b5fd;padding:10px 24px;}
 
-  /* ── HUD bar ── */
-  #hud {
-    display: flex;
-    gap: 12px;
-    align-items: center;
-    justify-content: center;
-    flex-wrap: wrap;
-    width: 100%;
-  }
+/* ── GAME LAYOUT ── */
+#game-screen{z-index:10;background:transparent;pointer-events:all;opacity:1;}
+#game-screen.hidden{opacity:0;pointer-events:none;}
+#app{position:relative;z-index:10;display:flex;flex-direction:column;align-items:center;gap:8px;width:100vw;max-width:980px;padding:8px;}
 
-  .hud-card {
-    background: var(--panel);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 8px 18px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    min-width: 80px;
-    backdrop-filter: blur(12px);
-    transition: border-color 0.3s;
-  }
-  .hud-card:hover { border-color: rgba(167,139,250,0.4); }
-  .hud-label {
-    font-size: 0.6rem;
-    letter-spacing: 0.25em;
-    text-transform: uppercase;
-    color: var(--text-dim);
-  }
-  .hud-value {
-    font-family: 'Cinzel Decorative', serif;
-    font-size: 1.3rem;
-    font-weight: 700;
-    color: #e8c6ff;
-    line-height: 1;
-    transition: transform 0.15s;
-  }
-  .hud-value.pop { transform: scale(1.35); color: #ffe066; }
+header{text-align:center;user-select:none;}
+header h1{font-family:'Cinzel Decorative',serif;font-size:clamp(1.1rem,2.5vw,1.8rem);font-weight:900;letter-spacing:.12em;
+  background:linear-gradient(135deg,#ffd700,#ff9a00,#e0c3fc,#96f7d2);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  filter:drop-shadow(0 0 14px rgba(255,215,0,.5));}
+#topic-badge{display:inline-flex;align-items:center;gap:6px;margin-top:3px;
+  font-family:'Rajdhani',sans-serif;font-size:.7rem;letter-spacing:.2em;text-transform:uppercase;
+  color:#ffd700;background:rgba(255,215,0,.08);border:1px solid rgba(255,215,0,.25);
+  border-radius:999px;padding:3px 12px;}
 
-  #combo-display {
-    font-size: 0.8rem;
-    letter-spacing: 0.15em;
-    padding: 6px 16px;
-    border-radius: 999px;
-    background: linear-gradient(90deg, rgba(255,78,26,0.2), rgba(167,139,250,0.2));
-    border: 1px solid rgba(255,224,51,0.3);
-    color: #ffe066;
-    opacity: 0;
-    transition: opacity 0.3s, transform 0.3s;
-    transform: translateY(4px);
-  }
-  #combo-display.visible { opacity: 1; transform: translateY(0); }
+/* HUD */
+#hud{display:flex;gap:10px;align-items:center;justify-content:center;flex-wrap:wrap;width:100%;}
+.hud-card{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:6px 16px;
+  display:flex;flex-direction:column;align-items:center;min-width:72px;backdrop-filter:blur(10px);}
+.hud-label{font-family:'Rajdhani',sans-serif;font-size:.58rem;letter-spacing:.25em;text-transform:uppercase;color:var(--dim);}
+.hud-value{font-family:'Cinzel Decorative',serif;font-size:1.15rem;font-weight:700;color:#e8c6ff;line-height:1;transition:transform .15s;}
+.hud-value.pop{transform:scale(1.35);color:#ffd700;}
+#combo-display{font-family:'Rajdhani',sans-serif;font-size:.8rem;letter-spacing:.15em;padding:5px 14px;border-radius:999px;
+  background:linear-gradient(90deg,rgba(255,78,26,.2),rgba(167,139,250,.2));border:1px solid rgba(255,224,51,.3);
+  color:#ffe066;opacity:0;transition:opacity .3s,transform .3s;transform:translateY(4px);}
+#combo-display.visible{opacity:1;transform:translateY(0);}
 
-  /* ── Main game area ── */
-  #game-area {
-    display: flex;
-    gap: 14px;
-    align-items: flex-start;
-    justify-content: center;
-    width: 100%;
-  }
+/* Rune alert bar */
+#rune-alert{display:flex;align-items:center;gap:10px;padding:7px 20px;border-radius:999px;
+  background:linear-gradient(90deg,rgba(255,215,0,.12),rgba(255,150,0,.08));
+  border:1px solid rgba(255,215,0,.35);font-family:'Rajdhani',sans-serif;font-size:.8rem;letter-spacing:.12em;
+  color:#ffd700;opacity:0;transition:opacity .4s;pointer-events:none;}
+#rune-alert.visible{opacity:1;}
+#rune-alert .pulse{width:8px;height:8px;border-radius:50%;background:#ffd700;box-shadow:0 0 8px #ffd700;animation:blink .8s infinite;}
+@keyframes blink{0%,100%{opacity:1;}50%{opacity:.2;}}
 
-  /* ── Side panels ── */
-  .side-panel {
-    background: var(--panel);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    padding: 14px 12px;
-    width: 140px;
-    flex-shrink: 0;
-    backdrop-filter: blur(12px);
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
-  .side-panel h3 {
-    font-family: 'Cinzel Decorative', serif;
-    font-size: 0.6rem;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    color: var(--text-dim);
-    text-align: center;
-    border-bottom: 1px solid var(--border);
-    padding-bottom: 6px;
-  }
+/* Moves bar */
+#moves-bar-wrap{max-width:520px;width:100%;}
+#moves-label{display:flex;justify-content:space-between;font-family:'Rajdhani',sans-serif;font-size:.62rem;color:var(--dim);letter-spacing:.15em;text-transform:uppercase;margin-bottom:4px;}
+#moves-bar-bg{width:100%;height:6px;background:rgba(255,255,255,0.06);border-radius:99px;overflow:hidden;}
+#moves-bar-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,#a78bfa,#60d0ff);box-shadow:0 0 8px rgba(96,208,255,.6);transition:width .4s ease,background .4s;}
 
-  .element-legend {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-  }
-  .elem-row {
-    display: flex;
-    align-items: center;
-    gap: 7px;
-    font-size: 0.68rem;
-    color: var(--text-dim);
-  }
-  .elem-dot {
-    width: 14px; height: 14px;
-    border-radius: 50%;
-    flex-shrink: 0;
-    box-shadow: 0 0 6px currentColor;
-  }
+/* Game area */
+#game-area{display:flex;gap:12px;align-items:flex-start;justify-content:center;width:100%;}
+.side-panel{background:var(--panel);border:1px solid var(--border);border-radius:16px;padding:12px 10px;width:138px;flex-shrink:0;backdrop-filter:blur(10px);display:flex;flex-direction:column;gap:10px;}
+.side-panel h3{font-family:'Rajdhani',sans-serif;font-size:.6rem;letter-spacing:.22em;text-transform:uppercase;color:var(--dim);text-align:center;border-bottom:1px solid var(--border);padding-bottom:6px;}
+.elem-row{display:flex;align-items:center;gap:7px;font-family:'Rajdhani',sans-serif;font-size:.7rem;color:var(--dim);}
+.elem-dot{width:13px;height:13px;border-radius:50%;flex-shrink:0;}
 
-  .reaction-list {
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
-  }
-  .reaction-item {
-    font-size: 0.62rem;
-    color: var(--text-dim);
-    line-height: 1.4;
-    padding: 4px 6px;
-    border-radius: 6px;
-    background: rgba(255,255,255,0.03);
-    border-left: 2px solid;
-  }
-  .reaction-item.fire-r  { border-color: var(--fire);      color: #ffaa88; }
-  .reaction-item.water-r { border-color: var(--water);     color: #88ddff; }
-  .reaction-item.light-r { border-color: var(--lightning); color: #ffee88; }
-  .reaction-item.earth-r { border-color: var(--earth);     color: #aaffaa; }
-  .reaction-item.shadow-r{ border-color: var(--shadow);    color: #dd99ff; }
+/* Progress toward next rune */
+#rune-progress-wrap{display:flex;flex-direction:column;gap:4px;}
+#rune-progress-label{font-family:'Rajdhani',sans-serif;font-size:.6rem;letter-spacing:.15em;text-transform:uppercase;color:#ffd700;}
+#rune-progress-bar-bg{width:100%;height:5px;background:rgba(255,215,0,.1);border-radius:99px;overflow:hidden;}
+#rune-progress-bar{height:100%;border-radius:99px;background:linear-gradient(90deg,#b8860b,#ffd700);transition:width .5s ease;width:0%;}
+#rune-count-info{font-family:'Rajdhani',sans-serif;font-size:.62rem;color:var(--dim);}
 
-  /* ── Canvas wrapper ── */
-  #canvas-wrapper {
-    position: relative;
-    flex-shrink: 0;
-    border-radius: 20px;
-    overflow: hidden;
-    box-shadow:
-      0 0 0 1px rgba(255,255,255,0.08),
-      0 0 60px rgba(100,60,180,0.4),
-      0 0 120px rgba(60,20,120,0.3),
-      inset 0 0 40px rgba(0,0,0,0.5);
-  }
-  #canvas-wrapper::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    border-radius: 20px;
-    border: 1px solid rgba(167,139,250,0.25);
-    pointer-events: none;
-    z-index: 20;
-  }
+/* Stats panel */
+.stat-row{display:flex;justify-content:space-between;align-items:center;}
+.stat-key{font-family:'Rajdhani',sans-serif;font-size:.62rem;color:var(--dim);letter-spacing:.08em;}
+.stat-val{font-family:'Rajdhani',sans-serif;font-size:.78rem;color:#c4b5fd;font-weight:600;}
+.stat-val.gold{color:#ffd700;}
 
-  #game-canvas {
-    display: block;
-    cursor: pointer;
-    border-radius: 20px;
-  }
+/* Canvas */
+#canvas-wrapper{position:relative;flex-shrink:0;border-radius:18px;overflow:hidden;
+  box-shadow:0 0 0 1px rgba(255,255,255,0.07),0 0 50px rgba(100,60,180,.35),0 0 100px rgba(60,20,120,.25),inset 0 0 40px rgba(0,0,0,.5);}
+#canvas-wrapper::before{content:'';position:absolute;inset:0;border-radius:18px;border:1px solid rgba(255,215,0,.15);pointer-events:none;z-index:20;}
+#game-canvas{display:block;cursor:pointer;border-radius:18px;}
+#particle-canvas{position:absolute;inset:0;pointer-events:none;border-radius:18px;z-index:15;}
 
-  /* ── Particle canvas (overlay) ── */
-  #particle-canvas {
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-    border-radius: 20px;
-    z-index: 15;
-  }
+/* Bottom strip */
+#level-strip{display:flex;gap:14px;align-items:center;justify-content:center;font-family:'Rajdhani',sans-serif;font-size:.68rem;color:var(--dim);letter-spacing:.18em;text-transform:uppercase;}
+#level-strip span{color:#c4b5fd;font-weight:600;}
+#level-strip .gold{color:#ffd700;}
 
-  /* ── Moves meter ── */
-  #moves-bar-wrap {
-    width: 100%;
-  }
-  #moves-label {
-    display: flex;
-    justify-content: space-between;
-    font-size: 0.65rem;
-    color: var(--text-dim);
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    margin-bottom: 5px;
-  }
-  #moves-bar-bg {
-    width: 100%;
-    height: 6px;
-    background: rgba(255,255,255,0.06);
-    border-radius: 99px;
-    overflow: hidden;
-  }
-  #moves-bar-fill {
-    height: 100%;
-    border-radius: 99px;
-    background: linear-gradient(90deg, #a78bfa, #60d0ff);
-    box-shadow: 0 0 8px rgba(96,208,255,0.6);
-    transition: width 0.4s ease, background 0.4s;
-  }
+/* ── QUESTION OVERLAY ── */
+#question-overlay{position:fixed;inset:0;z-index:200;display:flex;align-items:center;justify-content:center;
+  background:rgba(7,4,15,.92);backdrop-filter:blur(20px);opacity:0;pointer-events:none;transition:opacity .35s;}
+#question-overlay.active{opacity:1;pointer-events:all;}
+.q-card{background:linear-gradient(135deg,rgba(30,12,60,.98),rgba(10,6,20,.99));
+  border:1px solid rgba(255,215,0,.3);border-radius:24px;padding:40px 44px;text-align:center;max-width:480px;width:92%;
+  box-shadow:0 0 80px rgba(255,215,0,.2),0 0 160px rgba(100,60,180,.3);
+  transform:scale(.92);transition:transform .35s;}
+#question-overlay.active .q-card{transform:scale(1);}
+.q-rune-display{width:72px;height:72px;border-radius:50%;margin:0 auto 18px;display:flex;align-items:center;justify-content:center;
+  font-family:'Cinzel Decorative',serif;font-size:1.8rem;font-weight:900;color:#1a1000;
+  background:radial-gradient(circle at 35% 30%,#ffe88a,#ffd700 55%,#b8860b);
+  box-shadow:0 0 30px rgba(255,215,0,.6),0 0 60px rgba(255,215,0,.3);}
+.q-card h3{font-family:'Cinzel Decorative',serif;font-size:1rem;letter-spacing:.1em;color:#ffd700;margin-bottom:6px;}
+.q-topic-badge{font-family:'Rajdhani',sans-serif;font-size:.65rem;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--dim);margin-bottom:18px;display:block;}
+.q-question{font-size:1.1rem;color:var(--text);line-height:1.65;margin-bottom:24px;font-style:italic;}
+.q-choices{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px;}
+.q-choice{background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:12px;padding:12px 10px;
+  cursor:pointer;font-family:'Rajdhani',sans-serif;font-size:.85rem;font-weight:600;letter-spacing:.05em;
+  color:var(--text);transition:all .2s;text-align:left;}
+.q-choice:hover{border-color:rgba(255,215,0,.4);background:rgba(255,215,0,.07);color:#ffd700;}
+.q-choice.correct{border-color:#7fff5e;background:rgba(127,255,94,.12);color:#7fff5e;pointer-events:none;}
+.q-choice.wrong{border-color:#ff4e1a;background:rgba(255,78,26,.1);color:#ff4e1a;pointer-events:none;}
+.q-choice.reveal{border-color:#7fff5e;background:rgba(127,255,94,.08);color:#7fff5e;pointer-events:none;}
+.q-feedback{font-family:'Rajdhani',sans-serif;font-size:.85rem;letter-spacing:.1em;min-height:22px;margin-bottom:10px;}
+.q-feedback.good{color:#7fff5e;}
+.q-feedback.bad{color:#ff4e1a;}
+.q-timer-bar-bg{width:100%;height:5px;background:rgba(255,255,255,.08);border-radius:99px;overflow:hidden;margin-bottom:16px;}
+.q-timer-bar{height:100%;border-radius:99px;background:linear-gradient(90deg,#ffd700,#ff9a00);transition:width .1s linear;width:100%;}
+.q-stakes{font-family:'Rajdhani',sans-serif;font-size:.7rem;color:var(--dim);margin-bottom:16px;}
+.q-stakes .good{color:#7fff5e;} .q-stakes .bad{color:#ff4e1a;}
 
-  /* ── Level info strip ── */
-  #level-strip {
-    display: flex;
-    gap: 16px;
-    align-items: center;
-    justify-content: center;
-    font-size: 0.7rem;
-    color: var(--text-dim);
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-  }
-  #level-strip span { color: #c4b5fd; font-weight: 600; }
+/* ── GENERIC OVERLAYS ── */
+.overlay{position:fixed;inset:0;z-index:100;display:flex;align-items:center;justify-content:center;
+  background:rgba(5,2,14,.88);backdrop-filter:blur(16px);opacity:0;pointer-events:none;transition:opacity .4s;}
+.overlay.active{opacity:1;pointer-events:all;}
+.overlay-card{background:linear-gradient(135deg,rgba(30,12,60,.95),rgba(10,6,20,.98));border:1px solid rgba(167,139,250,.3);
+  border-radius:24px;padding:42px 46px;text-align:center;max-width:420px;width:90%;
+  box-shadow:0 0 80px rgba(100,60,180,.5);transform:translateY(20px);transition:transform .4s;}
+.overlay.active .overlay-card{transform:translateY(0);}
+.overlay-card h2{font-family:'Cinzel Decorative',serif;font-size:1.7rem;
+  background:linear-gradient(135deg,#ffd700,#ff9a00,#e0c3fc);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:10px;}
+.overlay-card p{color:var(--dim);font-size:.88rem;letter-spacing:.08em;line-height:1.75;margin-bottom:8px;}
+.big-score{font-family:'Cinzel Decorative',serif;font-size:2.8rem;color:#ffd700;filter:drop-shadow(0 0 18px rgba(255,215,0,.6));margin:14px 0;display:block;}
+.stars-row{display:flex;justify-content:center;gap:10px;margin:12px 0;}
+.star{font-size:1.9rem;opacity:.2;transition:opacity .3s,transform .3s;transition-delay:var(--d,0s);}
+.star.lit{opacity:1;transform:scale(1.2) rotate(8deg);}
+.score-breakdown{display:flex;flex-direction:column;gap:5px;margin:14px 0;font-family:'Rajdhani',sans-serif;font-size:.8rem;}
+.breakdown-row{display:flex;justify-content:space-between;padding:4px 10px;border-radius:8px;background:rgba(255,255,255,.03);}
+.breakdown-row .label{color:var(--dim);}
+.breakdown-row .val{color:#ffd700;font-weight:600;}
 
-  /* ── Overlay screens ── */
-  .overlay {
-    position: fixed;
-    inset: 0;
-    z-index: 100;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: rgba(5,2,14,0.88);
-    backdrop-filter: blur(16px);
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.4s;
-  }
-  .overlay.active { opacity: 1; pointer-events: all; }
+/* Score popup */
+.score-popup{position:fixed;pointer-events:none;font-family:'Rajdhani',sans-serif;font-weight:700;font-size:1rem;
+  text-shadow:0 0 10px currentColor;animation:floatUp 1.1s forwards ease-out;z-index:300;white-space:nowrap;}
+@keyframes floatUp{0%{opacity:1;transform:translateY(0) scale(1);}60%{opacity:1;transform:translateY(-40px) scale(1.1);}100%{opacity:0;transform:translateY(-70px) scale(.9);}}
 
-  .overlay-card {
-    background: linear-gradient(135deg, rgba(30,12,60,0.95), rgba(10,6,20,0.98));
-    border: 1px solid rgba(167,139,250,0.3);
-    border-radius: 24px;
-    padding: 44px 48px;
-    text-align: center;
-    max-width: 420px;
-    width: 90%;
-    box-shadow: 0 0 80px rgba(100,60,180,0.5), 0 0 160px rgba(60,20,120,0.3);
-    transform: translateY(20px);
-    transition: transform 0.4s;
-  }
-  .overlay.active .overlay-card { transform: translateY(0); }
-
-  .overlay-card h2 {
-    font-family: 'Cinzel Decorative', serif;
-    font-size: 1.8rem;
-    background: linear-gradient(135deg, #e8c6ff, #a78bfa, #60d0ff);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    margin-bottom: 10px;
-  }
-  .overlay-card p {
-    color: var(--text-dim);
-    font-size: 0.85rem;
-    letter-spacing: 0.1em;
-    line-height: 1.7;
-    margin-bottom: 8px;
-  }
-  .overlay-card .big-score {
-    font-family: 'Cinzel Decorative', serif;
-    font-size: 3rem;
-    color: #ffe066;
-    filter: drop-shadow(0 0 20px rgba(255,224,51,0.6));
-    margin: 14px 0;
-    display: block;
-  }
-
-  .btn {
-    display: inline-block;
-    margin-top: 20px;
-    padding: 12px 32px;
-    border-radius: 999px;
-    border: none;
-    font-family: 'Cinzel Decorative', serif;
-    font-size: 0.8rem;
-    letter-spacing: 0.15em;
-    cursor: pointer;
-    transition: transform 0.2s, box-shadow 0.2s, filter 0.2s;
-    text-transform: uppercase;
-  }
-  .btn:hover { transform: scale(1.06); filter: brightness(1.15); }
-  .btn:active { transform: scale(0.97); }
-
-  .btn-primary {
-    background: linear-gradient(135deg, #7c3aed, #a855f7, #5b21b6);
-    color: #fff;
-    box-shadow: 0 0 24px rgba(124,58,237,0.5);
-  }
-  .btn-secondary {
-    background: transparent;
-    border: 1px solid rgba(167,139,250,0.4);
-    color: #c4b5fd;
-    margin-left: 10px;
-  }
-
-  .stars-row {
-    display: flex;
-    justify-content: center;
-    gap: 10px;
-    margin: 14px 0;
-  }
-  .star {
-    font-size: 2rem;
-    opacity: 0.2;
-    transition: opacity 0.3s, transform 0.3s;
-    transition-delay: var(--d, 0s);
-  }
-  .star.lit { opacity: 1; transform: scale(1.2) rotate(10deg); }
-
-  /* ── Floating score popups ── */
-  .score-popup {
-    position: absolute;
-    pointer-events: none;
-    font-family: 'Cinzel Decorative', serif;
-    font-weight: 700;
-    font-size: 1rem;
-    text-shadow: 0 0 10px currentColor;
-    animation: floatUp 1.1s forwards ease-out;
-    z-index: 50;
-    white-space: nowrap;
-  }
-  @keyframes floatUp {
-    0%   { opacity: 1; transform: translateY(0) scale(1); }
-    60%  { opacity: 1; transform: translateY(-40px) scale(1.1); }
-    100% { opacity: 0; transform: translateY(-70px) scale(0.9); }
-  }
-
-  /* ── Responsive ── */
-  @media (max-width: 700px) {
-    .side-panel { display: none; }
-    #game-area { flex-direction: column; align-items: center; }
-  }
+@media(max-width:720px){.side-panel{display:none;}#game-area{flex-direction:column;align-items:center;}}
 </style>
 </head>
 <body>
-
 <canvas id="bg-canvas"></canvas>
 
+<!-- ── TOPIC SELECTION SCREEN ── -->
+<div class="screen" id="topic-screen">
+  <div class="card">
+    <h1>✦ Crystalline ✦</h1>
+    <div class="subtitle">Elemental Knowledge Puzzle</div>
+    <div class="how">
+      Match gems to score points. As you progress, <strong>Rune Gems ✦</strong> appear on the board — each branded with an abbreviation from your chosen topic. Match a Rune Gem to unlock a question. <strong>Answer correctly</strong> for massive bonus points &amp; extra moves. <strong>Answer wrong</strong> and lose moves. The higher the level, the harder the questions and the more Runes appear!
+    </div>
+    <div class="topic-grid" id="topic-grid"></div>
+    <button class="btn btn-gold" onclick="confirmTopic()" id="start-btn" disabled>Choose a Topic to Begin ✦</button>
+  </div>
+</div>
+
+<!-- ── GAME SCREEN ── -->
+<div class="screen hidden" id="game-screen">
 <div id="app">
   <header>
     <h1>✦ Crystalline ✦</h1>
-    <p>Elemental Gem Puzzle</p>
+    <div id="topic-badge"></div>
   </header>
 
-  <!-- HUD -->
   <div id="hud">
-    <div class="hud-card">
-      <span class="hud-label">Score</span>
-      <span class="hud-value" id="score-display">0</span>
-    </div>
-    <div class="hud-card">
-      <span class="hud-label">Level</span>
-      <span class="hud-value" id="level-display">1</span>
-    </div>
-    <div class="hud-card">
-      <span class="hud-label">Best</span>
-      <span class="hud-value" id="best-display">0</span>
-    </div>
+    <div class="hud-card"><span class="hud-label">Score</span><span class="hud-value" id="score-display">0</span></div>
+    <div class="hud-card"><span class="hud-label">Level</span><span class="hud-value" id="level-display">1</span></div>
+    <div class="hud-card"><span class="hud-label">Best</span><span class="hud-value" id="best-display">0</span></div>
+    <div class="hud-card"><span class="hud-label">Runes ✦</span><span class="hud-value" id="rune-display" style="color:#ffd700">0</span></div>
     <div id="combo-display">🔥 COMBO x<span id="combo-num">0</span></div>
   </div>
 
-  <!-- Moves bar -->
-  <div id="moves-bar-wrap" style="max-width:500px;width:100%;">
-    <div id="moves-label">
-      <span>Moves</span>
-      <span id="moves-count">20 / 20</span>
-    </div>
-    <div id="moves-bar-bg"><div id="moves-bar-fill" style="width:100%"></div></div>
+  <div id="rune-alert"><div class="pulse"></div><span id="rune-alert-text">A Rune Gem has appeared! Match it to unlock a question!</span></div>
+
+  <div id="moves-bar-wrap">
+    <div id="moves-label"><span>Moves Remaining</span><span id="moves-count">20 / 20</span></div>
+    <div id="moves-bar-bg"><div id="moves-bar-fill"></div></div>
   </div>
 
-  <!-- Main game area -->
   <div id="game-area">
-
-    <!-- Left panel: elements -->
     <div class="side-panel">
       <h3>Elements</h3>
-      <div class="element-legend">
-        <div class="elem-row"><div class="elem-dot" style="background:var(--fire);color:var(--fire)"></div>Fire</div>
-        <div class="elem-row"><div class="elem-dot" style="background:var(--water);color:var(--water)"></div>Water</div>
-        <div class="elem-row"><div class="elem-dot" style="background:var(--ice);color:var(--ice)"></div>Ice</div>
-        <div class="elem-row"><div class="elem-dot" style="background:var(--lightning);color:var(--lightning)"></div>Lightning</div>
-        <div class="elem-row"><div class="elem-dot" style="background:var(--earth);color:var(--earth)"></div>Earth</div>
-        <div class="elem-row"><div class="elem-dot" style="background:var(--shadow);color:var(--shadow)"></div>Shadow</div>
+      <div style="display:flex;flex-direction:column;gap:5px;">
+        <div class="elem-row"><div class="elem-dot" style="background:#ff4e1a"></div>Fire 🔥</div>
+        <div class="elem-row"><div class="elem-dot" style="background:#00c8ff"></div>Water 💧</div>
+        <div class="elem-row"><div class="elem-dot" style="background:#a8f0ff"></div>Ice ❄️</div>
+        <div class="elem-row"><div class="elem-dot" style="background:#ffe033"></div>Lightning ⚡</div>
+        <div class="elem-row"><div class="elem-dot" style="background:#7fff5e"></div>Earth 🌿</div>
+        <div class="elem-row"><div class="elem-dot" style="background:#cc44ff"></div>Shadow 🔮</div>
+      </div>
+      <h3 style="margin-top:4px;">Rune ✦</h3>
+      <div class="elem-row"><div class="elem-dot" style="background:#ffd700;box-shadow:0 0 6px #ffd700"></div><span style="color:#ffd700;font-size:.68rem;">Knowledge Gem</span></div>
+      <div style="font-size:.62rem;color:var(--dim);line-height:1.5;">Match rune gems to trigger a quiz question!</div>
+      <div id="rune-progress-wrap">
+        <div id="rune-progress-label">Next Rune</div>
+        <div id="rune-progress-bar-bg"><div id="rune-progress-bar"></div></div>
+        <div id="rune-count-info"></div>
       </div>
     </div>
 
-    <!-- Game canvas -->
     <div id="canvas-wrapper">
       <canvas id="game-canvas"></canvas>
       <canvas id="particle-canvas"></canvas>
     </div>
 
-    <!-- Right panel: reactions -->
     <div class="side-panel">
-      <h3>Reactions</h3>
-      <div class="reaction-list">
-        <div class="reaction-item fire-r">🔥 Fire<br>melts ❄️ Ice</div>
-        <div class="reaction-item water-r">💧 Water<br>conducts ⚡</div>
-        <div class="reaction-item light-r">⚡ Lightning<br>ignites 🔥</div>
-        <div class="reaction-item earth-r">🌿 Earth<br>absorbs 💧</div>
-        <div class="reaction-item shadow-r">🔮 Shadow<br>copies all</div>
-        <div class="reaction-item fire-r">🔥+🌿<br>= Wildfire!</div>
+      <h3>Difficulty</h3>
+      <div id="difficulty-panel" style="display:flex;flex-direction:column;gap:6px;"></div>
+      <h3 style="margin-top:4px;">Stats</h3>
+      <div style="display:flex;flex-direction:column;gap:5px;">
+        <div class="stat-row"><span class="stat-key">Questions</span><span class="stat-val" id="stat-q">0</span></div>
+        <div class="stat-row"><span class="stat-key">Correct</span><span class="stat-val gold" id="stat-c">0</span></div>
+        <div class="stat-row"><span class="stat-key">Accuracy</span><span class="stat-val" id="stat-a">—</span></div>
+        <div class="stat-row"><span class="stat-key">Best Combo</span><span class="stat-val" id="stat-bc">0</span></div>
       </div>
     </div>
-
   </div>
 
-  <!-- Level strip -->
   <div id="level-strip">
-    Target: <span id="target-display">500</span> pts
-    &nbsp;|&nbsp;
-    Objective: <span id="objective-display">Clear fire gems</span>
+    Target: <span id="target-display">500</span> pts &nbsp;|&nbsp;
+    Runes on board: <span class="gold" id="runes-on-board">0</span> &nbsp;|&nbsp;
+    <span id="objective-display">Get 500 points!</span>
   </div>
 </div>
+</div>
 
-<!-- Overlays -->
-<div class="overlay active" id="start-overlay">
-  <div class="overlay-card">
-    <h2>✦ Crystalline ✦</h2>
-    <p>Match 3+ elemental gems to trigger chain reactions.<br>
-    Combine elements for massive combos & bonus points.</p>
-    <div style="margin:16px 0;display:flex;flex-wrap:wrap;gap:8px;justify-content:center;font-size:0.75rem;color:#c4b5fd;">
-      <span>🔥 Fire</span><span>💧 Water</span><span>❄️ Ice</span>
-      <span>⚡ Lightning</span><span>🌿 Earth</span><span>🔮 Shadow</span>
+<!-- ── QUESTION OVERLAY ── -->
+<div id="question-overlay">
+  <div class="q-card">
+    <div class="q-rune-display" id="q-rune-letter">?</div>
+    <h3>Rune Challenge ✦</h3>
+    <span class="q-topic-badge" id="q-topic-name"></span>
+    <div class="q-timer-bar-bg"><div class="q-timer-bar" id="q-timer-bar"></div></div>
+    <div class="q-question" id="q-question-text"></div>
+    <div class="q-choices" id="q-choices"></div>
+    <div class="q-feedback" id="q-feedback"></div>
+    <div class="q-stakes">
+      ✅ Correct: <span class="good">+<span id="q-bonus">500</span> pts + 2 moves</span> &nbsp;|&nbsp;
+      ❌ Wrong: <span class="bad">−2 moves</span>
     </div>
-    <p style="color:#a78bfa;font-size:0.78rem;">Click a gem, then click an adjacent gem to swap.<br>Chain reactions earn massive bonuses!</p>
-    <button class="btn btn-primary" onclick="startGame()">Begin Journey ✨</button>
   </div>
 </div>
 
+<!-- ── LEVEL COMPLETE ── -->
 <div class="overlay" id="level-overlay">
   <div class="overlay-card">
     <h2 id="level-title">Level Complete!</h2>
     <div class="stars-row">
       <span class="star" style="--d:0s">⭐</span>
-      <span class="star" style="--d:0.15s">⭐</span>
-      <span class="star" style="--d:0.3s">⭐</span>
+      <span class="star" style="--d:.15s">⭐</span>
+      <span class="star" style="--d:.3s">⭐</span>
     </div>
-    <p>Score</p>
     <span class="big-score" id="level-score">0</span>
-    <p id="level-feedback">Excellent work!</p>
-    <button class="btn btn-primary" onclick="nextLevel()">Next Level ➤</button>
-    <button class="btn btn-secondary" onclick="restartGame()">Restart</button>
+    <div class="score-breakdown" id="score-breakdown"></div>
+    <p id="level-feedback"></p>
+    <button class="btn btn-gold" onclick="nextLevel()" style="margin-top:16px;">Next Level ➤</button>
+    <button class="btn btn-ghost" onclick="restartGame()" style="margin-left:10px;margin-top:16px;">Restart</button>
   </div>
 </div>
 
+<!-- ── GAME OVER ── -->
 <div class="overlay" id="gameover-overlay">
   <div class="overlay-card">
     <h2>Game Over</h2>
-    <p>Out of moves! Final Score:</p>
     <span class="big-score" id="final-score">0</span>
-    <p id="gameover-feedback">Keep practising!</p>
-    <button class="btn btn-primary" onclick="restartGame()">Play Again ✨</button>
+    <div class="score-breakdown" id="go-breakdown"></div>
+    <p id="gameover-feedback"></p>
+    <button class="btn btn-purple" onclick="restartGame()" style="margin-top:16px;">Play Again ✦</button>
+    <button class="btn btn-ghost" onclick="goToTopicSelect()" style="margin-left:10px;margin-top:16px;">Change Topic</button>
   </div>
 </div>
 
