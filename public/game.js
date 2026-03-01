@@ -1,5 +1,5 @@
 /* ================================================================
-   CRYSTALLINE v6
+   CRYSTALLINE
    - Longer question timers (no rush)
    - Rune gems inherit element type → explode in their color
    - Lower base scores (50–150), lower reaction bonuses (55–100)
@@ -78,17 +78,17 @@ const FALLBACK = {
 // Question timers are generous — players need time to think.
 // Base gem scores are low (50–150) so levels take real effort.
 const LEVELS = [
-  // maxRunes = how many rune gems can be on the board at once (3–5 across all levels)
-  // runeThreshold = score needed before first rune spawns
-  // runeEvery = score gap between each new rune spawn after the first
-  { moves:32, target:1200,  runeThreshold:120, runeEvery:150, maxRunes:3, questionTime:40, correctBonus:350,  wrongPenalty:1, label:'Novice',     diffColor:'#7fff5e', aiDiff:1 },
-  { moves:30, target:2600,  runeThreshold:110, runeEvery:130, maxRunes:3, questionTime:36, correctBonus:450,  wrongPenalty:2, label:'Apprentice', diffColor:'#96f7d2', aiDiff:1 },
-  { moves:28, target:4500,  runeThreshold:100, runeEvery:120, maxRunes:4, questionTime:32, correctBonus:580,  wrongPenalty:2, label:'Scholar',    diffColor:'#00c8ff', aiDiff:2 },
-  { moves:26, target:7000,  runeThreshold:90,  runeEvery:110, maxRunes:4, questionTime:28, correctBonus:700,  wrongPenalty:2, label:'Adept',      diffColor:'#a78bfa', aiDiff:3 },
-  { moves:24, target:10500, runeThreshold:80,  runeEvery:100, maxRunes:4, questionTime:24, correctBonus:820,  wrongPenalty:3, label:'Veteran',    diffColor:'#c084fc', aiDiff:3 },
-  { moves:22, target:15000, runeThreshold:70,  runeEvery:90,  maxRunes:5, questionTime:20, correctBonus:950,  wrongPenalty:3, label:'Expert',     diffColor:'#ff9a00', aiDiff:4 },
-  { moves:20, target:21000, runeThreshold:60,  runeEvery:80,  maxRunes:5, questionTime:17, correctBonus:1100, wrongPenalty:4, label:'Elite',      diffColor:'#f97316', aiDiff:4 },
-  { moves:18, target:28000, runeThreshold:50,  runeEvery:70,  maxRunes:5, questionTime:14, correctBonus:1400, wrongPenalty:4, label:'Master',     diffColor:'#ff4e1a', aiDiff:5 },
+  // targets are HIGH — the player must earn score over many moves, not rush through.
+  // correctBonus is meaningful but won't single-handedly finish a level.
+  // runeThreshold/runeEvery are tight so questions fire frequently throughout each level.
+  { moves:40, target:3000,  runeThreshold:100, runeEvery:120, maxRunes:3, questionTime:40, correctBonus:200,  wrongPenalty:1, label:'Novice',     diffColor:'#7fff5e', aiDiff:1 },
+  { moves:38, target:6000,  runeThreshold:100, runeEvery:110, maxRunes:3, questionTime:36, correctBonus:220,  wrongPenalty:2, label:'Apprentice', diffColor:'#96f7d2', aiDiff:1 },
+  { moves:36, target:10000, runeThreshold:90,  runeEvery:100, maxRunes:4, questionTime:32, correctBonus:250,  wrongPenalty:2, label:'Scholar',    diffColor:'#00c8ff', aiDiff:2 },
+  { moves:34, target:15000, runeThreshold:85,  runeEvery:95,  maxRunes:4, questionTime:28, correctBonus:280,  wrongPenalty:2, label:'Adept',      diffColor:'#a78bfa', aiDiff:3 },
+  { moves:32, target:22000, runeThreshold:80,  runeEvery:90,  maxRunes:4, questionTime:24, correctBonus:310,  wrongPenalty:3, label:'Veteran',    diffColor:'#c084fc', aiDiff:3 },
+  { moves:30, target:30000, runeThreshold:75,  runeEvery:85,  maxRunes:5, questionTime:20, correctBonus:340,  wrongPenalty:3, label:'Expert',     diffColor:'#ff9a00', aiDiff:4 },
+  { moves:28, target:40000, runeThreshold:70,  runeEvery:80,  maxRunes:5, questionTime:17, correctBonus:380,  wrongPenalty:4, label:'Elite',      diffColor:'#f97316', aiDiff:4 },
+  { moves:26, target:55000, runeThreshold:65,  runeEvery:75,  maxRunes:5, questionTime:14, correctBonus:420,  wrongPenalty:4, label:'Master',     diffColor:'#ff4e1a', aiDiff:5 },
 ];
 
 // ── GEM CONSTANTS ─────────────────────────────────────────────────────────────
