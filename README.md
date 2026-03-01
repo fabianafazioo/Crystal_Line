@@ -1,6 +1,7 @@
-# ✦ Crystalline v4 — Elemental Knowledge Puzzle
+# ✦ Crystalline — Elemental Knowledge Puzzle
+Live Demo: https://crystal-line.vercel.app
 
-## 🆕 What's New in v4
+## 🆕 What's New 
 - **Diagonal Matches** — gems now match in ↗ and ↘ directions too!
 - **AI-Powered Questions** — OpenAI generates unique, never-repeated questions
 - **Scaling AI Difficulty** — questions get harder every level (Novice → Master)
@@ -12,15 +13,16 @@
 
 ## 📁 Project Structure
 ```
-crystalline-v4/
-├── server.js          ← Node.js backend (holds your API key securely)
-├── env-loader.js      ← Reads your .env file
-├── .env               ← YOUR API KEY GOES HERE (never commit this!)
-├── .gitignore         ← Protects your .env from being uploaded
+crystal_line/
+├── api/
+│   └── questions.js     ← holds API key
 ├── public/
-│   ├── index.html     ← Game UI
-│   └── game.js        ← Full game engine
-└── README.md
+│   ├── index.html       ← Game UI
+│   └── game.js          ← Full game engine
+├── vercel.json          ← Tells Vercel how to route
+├── .env                 ← LOCAL ONLY, never pushed (your real key)
+├── .env.example         ← Pushed to GitHub (placeholder only)
+└── .gitignore           ← Already blocks .env
 ```
 
 ---
@@ -33,43 +35,15 @@ crystalline-v4/
    OPENAI_API_KEY=sk-proj-abc123...your-real-key
    ```
 3. Save the file. **Never share this file or upload it to GitHub** — the `.gitignore` already protects it.
-
+4. Use `.env.example` as a key holder example, key is never here.
 ---
 
 ## 💻 Running the Game (VS Code)
 
-### Step 1 — Make sure Node.js is installed
-Download from: https://nodejs.org (choose the LTS version)
+### Step 1 — Open the project in VS Code
+Make sure to download liveserver and use it to see it in host 
+Open game at: http://localhost:3000
 
-Verify it's installed:
-```bash
-node --version
-```
-
-### Step 2 — Open the project in VS Code
-File → Open Folder → select `crystalline-v4`
-
-### Step 3 — Open the terminal in VS Code
-Terminal → New Terminal
-
-### Step 4 — Start the server
-```bash
-node server.js
-```
-
-You should see:
-```
-✦ Crystalline Server Running ✦
-Open game at:  http://localhost:3000
-API key loaded: ✅ Yes
-```
-
-### Step 5 — Play!
-Open your browser and go to: **http://localhost:3000**
-
-> ⚠️ You must use `http://localhost:3000` — NOT Live Server or file:// this time!
-
----
 
 ## 🐙 Pushing to GitHub (safely)
 
