@@ -1,5 +1,5 @@
 /* ================================================================
-   CRYSTALLINE
+   CRYSTALLINE v5
    Fixes: H+V matching only (no diagonal), pause button,
           AI questions read from .env.example via server
    ================================================================ */
@@ -71,12 +71,26 @@ const FALLBACK = {
 };
 
 // ── LEVELS ────────────────────────────────────────────────────────────────────
+// 8 levels — each one meaningfully harder than the last.
+// targets are high enough that the player must use combos + rune bonuses to advance.
+// moves decrease each level, timers shrink, and runes flood the board at high levels.
 const LEVELS = [
-  { moves:22, target:600,  runeThreshold:150, runeEvery:200, maxRunes:1, questionTime:22, correctBonus:400, wrongPenalty:2, label:'Novice',     diffColor:'#7fff5e', aiDiff:1 },
-  { moves:20, target:1100, runeThreshold:100, runeEvery:170, maxRunes:2, questionTime:18, correctBonus:550, wrongPenalty:2, label:'Apprentice', diffColor:'#00c8ff', aiDiff:2 },
-  { moves:18, target:1800, runeThreshold:80,  runeEvery:140, maxRunes:2, questionTime:15, correctBonus:650, wrongPenalty:3, label:'Adept',      diffColor:'#a78bfa', aiDiff:3 },
-  { moves:17, target:2600, runeThreshold:60,  runeEvery:110, maxRunes:3, questionTime:12, correctBonus:780, wrongPenalty:3, label:'Expert',     diffColor:'#ff9a00', aiDiff:4 },
-  { moves:15, target:3500, runeThreshold:50,  runeEvery:90,  maxRunes:4, questionTime:9,  correctBonus:950, wrongPenalty:4, label:'Master',     diffColor:'#ff4e1a', aiDiff:5 },
+  // Level 1 — Novice: generous moves, slow rune pace, easy questions, learn the game
+  { moves:30, target:1200,  runeThreshold:200, runeEvery:300, maxRunes:1, questionTime:25, correctBonus:350,  wrongPenalty:1, label:'Novice',      diffColor:'#7fff5e', aiDiff:1 },
+  // Level 2 — Apprentice: still comfortable but runes start appearing
+  { moves:28, target:2500,  runeThreshold:160, runeEvery:260, maxRunes:1, questionTime:22, correctBonus:450,  wrongPenalty:2, label:'Apprentice',  diffColor:'#96f7d2', aiDiff:1 },
+  // Level 3 — Scholar: medium targets, 2 runes can appear, questions harder
+  { moves:26, target:4200,  runeThreshold:130, runeEvery:220, maxRunes:2, questionTime:20, correctBonus:580,  wrongPenalty:2, label:'Scholar',     diffColor:'#00c8ff', aiDiff:2 },
+  // Level 4 — Adept: timer pressure starts, must use reaction bonuses
+  { moves:24, target:6500,  runeThreshold:110, runeEvery:190, maxRunes:2, questionTime:17, correctBonus:700,  wrongPenalty:2, label:'Adept',       diffColor:'#a78bfa', aiDiff:3 },
+  // Level 5 — Veteran: fewer moves, higher targets, questions need real knowledge
+  { moves:22, target:9500,  runeThreshold:90,  runeEvery:160, maxRunes:3, questionTime:15, correctBonus:820,  wrongPenalty:3, label:'Veteran',     diffColor:'#c084fc', aiDiff:3 },
+  // Level 6 — Expert: tight on moves, runes everywhere, 12s timer
+  { moves:20, target:13500, runeThreshold:70,  runeEvery:130, maxRunes:3, questionTime:12, correctBonus:950,  wrongPenalty:3, label:'Expert',      diffColor:'#ff9a00', aiDiff:4 },
+  // Level 7 — Elite: brutal targets, must chain combos AND answer rune questions
+  { moves:18, target:18500, runeThreshold:55,  runeEvery:100, maxRunes:4, questionTime:10, correctBonus:1100, wrongPenalty:4, label:'Elite',       diffColor:'#f97316', aiDiff:4 },
+  // Level 8 — Master: maximum difficulty, 8s per question, 4 runes on board at once
+  { moves:16, target:25000, runeThreshold:40,  runeEvery:80,  maxRunes:4, questionTime:8,  correctBonus:1400, wrongPenalty:4, label:'Master',      diffColor:'#ff4e1a', aiDiff:5 },
 ];
 
 // ── GEM CONSTANTS ─────────────────────────────────────────────────────────────
@@ -589,7 +603,7 @@ async function processMatches() {
 }
 
 // ── QUESTION SYSTEM ───────────────────────────────────────────────────────────
-const DIFF_LABELS = ['','🟢 Novice','🔵 Apprentice','🟣 Adept','🟠 Expert','🔴 Master'];
+const DIFF_LABELS = ['','🟢 Easy','🔵 Medium','🟣 Challenging','🟠 Hard','🔴 Expert'];
 const DIFF_COLORS = ['','#7fff5e','#00c8ff','#a78bfa','#ff9a00','#ff4e1a'];
 
 function askRuneQuestion(qData) {
@@ -841,24 +855,57 @@ function checkGameState() {
 }
 
 function showLevelComplete() {
-  const lvl   = LEVELS[level];
-  const stars = score>=lvl.target*2 ? 3 : score>=lvl.target*1.4 ? 2 : 1;
-  document.getElementById('level-title').textContent    = level>=LEVELS.length-1 ? '🏆 You Are a Master!' : '✦ Level Complete!';
+  const lvl      = LEVELS[level];
+  const isLast   = level >= LEVELS.length - 1;
+  const stars    = score >= lvl.target*2 ? 3 : score >= lvl.target*1.4 ? 2 : 1;
+  const nextLvl  = !isLast ? LEVELS[level+1] : null;
+
+  const feedbackByStars = [
+    '', // 0 stars unused
+    'You made it! Push harder next level 💪',
+    'Solid run! Keep chaining those combos! ✨',
+    'Outstanding! You\'re a natural! 🔮',
+  ];
+  const levelTitles = [
+    '✦ Level Complete!',      // 1
+    '✦ Level Complete!',      // 2
+    '🔥 Rising Scholar!',     // 3
+    '⚡ Adept Cleared!',      // 4
+    '🌿 Veteran Achieved!',   // 5
+    '💜 Expert Unlocked!',    // 6
+    '🌟 Elite Status!',       // 7
+    '🏆 You Are a Master!',   // 8 (last)
+  ];
+
+  document.getElementById('level-title').textContent = isLast
+    ? '🏆 Grand Master! You Beat the Game!'
+    : (levelTitles[level] || '✦ Level Complete!');
+
   document.getElementById('level-score').textContent    = score.toLocaleString();
-  document.getElementById('level-feedback').textContent = ['','Keep going!','Nice work!','Amazing! 🔮'][stars]||'Brilliant!';
-  document.getElementById('score-breakdown').innerHTML  = `
+  document.getElementById('level-feedback').textContent = isLast
+    ? 'You conquered all 8 levels! Incredible! 🏆'
+    : feedbackByStars[stars] || 'Great run!';
+
+  document.getElementById('score-breakdown').innerHTML = `
     <div class="breakdown-row"><span class="label">Gem Matches</span><span class="val">+${gemScoreThisLevel.toLocaleString()}</span></div>
     <div class="breakdown-row"><span class="label">Rune Bonuses</span><span class="val">+${runeScoreThisLevel.toLocaleString()}</span></div>
     <div class="breakdown-row"><span class="label">Quiz Accuracy</span><span class="val">${runesAnswered>0?Math.round(runesCorrect/runesAnswered*100):0}%</span></div>
     <div class="breakdown-row"><span class="label">Best Combo</span><span class="val">x${bestCombo}</span></div>
-    <div class="breakdown-row"><span class="label">AI Questions</span><span class="val" style="color:#96f7d2">${usingAI?'✅ Live AI':'📦 Built-in'}</span></div>
+    ${nextLvl ? `<div class="breakdown-row"><span class="label">Next Target</span><span class="val" style="color:#ffd700">${nextLvl.target.toLocaleString()} pts</span></div>` : ''}
+    <div class="breakdown-row"><span class="label">Level</span><span class="val" style="color:${lvl.diffColor}">${lvl.label} (${level+1}/${LEVELS.length})</span></div>
   `;
+
   document.querySelectorAll('.star').forEach((el,i) => {
     el.classList.remove('lit');
     if (i<stars) setTimeout(()=>el.classList.add('lit'), 180+i*160);
   });
   document.getElementById('level-overlay').classList.add('active');
-  for (let i=0;i<8;i++) setTimeout(()=>spawnRP(Math.floor(Math.random()*COLS),Math.floor(Math.random()*ROWS),['#ff4e1a','#00c8ff','#ffe033','#cc44ff','#ffd700'][i%5],25),i*100);
+  const celebColors = ['#ff4e1a','#00c8ff','#ffe033','#cc44ff','#ffd700','#7fff5e'];
+  const bursts = isLast ? 16 : 8;
+  for (let i=0;i<bursts;i++) setTimeout(()=>spawnRP(
+    Math.floor(Math.random()*COLS), Math.floor(Math.random()*ROWS),
+    celebColors[i%celebColors.length], isLast?40:25
+  ), i*80);
 }
 
 function showGameOver() {
