@@ -1,5 +1,5 @@
 /* ================================================================
-   CRYSTALLINE
+   CRYSTALLINE v6
    - Longer question timers (no rush)
    - Rune gems inherit element type → explode in their color
    - Lower base scores (50–150), lower reaction bonuses (55–100)
@@ -92,7 +92,13 @@ const LEVELS = [
 ];
 
 // ── GEM CONSTANTS ─────────────────────────────────────────────────────────────
-const COLS=8, ROWS=8, GEM_SIZE=58, SWAP_MS=220, SHAKE_N=10;
+const COLS=8, ROWS=8, SWAP_MS=220, SHAKE_N=10;
+// Dynamic gem size: fills screen on mobile, capped at 58px on desktop
+function calcGemSize(){
+  const maxW=Math.min(window.innerWidth-32,480);
+  return Math.floor(Math.min(maxW/COLS,58));
+}
+let GEM_SIZE=calcGemSize();
 const ELEMENTS=['fire','water','ice','lightning','earth','shadow'];
 const ECOLORS={fire:'#ff4e1a',water:'#00c8ff',ice:'#a8f0ff',lightning:'#ffe033',earth:'#7fff5e',shadow:'#cc44ff'};
 const EGLOW={fire:'rgba(255,78,26,.7)',water:'rgba(0,200,255,.7)',ice:'rgba(168,240,255,.7)',lightning:'rgba(255,224,51,.7)',earth:'rgba(127,255,94,.7)',shadow:'rgba(204,68,255,.7)'};
@@ -136,9 +142,15 @@ const bgCanvas=document.getElementById('bg-canvas');
 const ctx =canvas.getContext('2d');
 const pCtx=pCanvas.getContext('2d');
 const bgCtx=bgCanvas.getContext('2d');
-const W=COLS*GEM_SIZE, H=ROWS*GEM_SIZE;
-canvas.width=pCanvas.width=W;
-canvas.height=pCanvas.height=H;
+// getW()/getH() helpers — always read current GEM_SIZE
+function getW(){ return COLS*GEM_SIZE; }
+function getH(){ return ROWS*GEM_SIZE; }
+function resizeCanvas(){
+  GEM_SIZE=calcGemSize();
+  canvas.width=pCanvas.width=getW();
+  canvas.height=pCanvas.height=getH();
+}
+resizeCanvas();
 
 // ── DOM ───────────────────────────────────────────────────────────────────────
 const scoreEl        = document.getElementById('score-display');
@@ -459,7 +471,7 @@ function drawGem(gem, col, row){
 
 // ── RENDER ────────────────────────────────────────────────────────────────────
 function renderBoard(){
-  ctx.clearRect(0,0,W,H);
+  ctx.clearRect(0,0,getW(),getH());
   for(let r=0;r<ROWS;r++) for(let c=0;c<COLS;c++){
     ctx.fillStyle=(r+c)%2===0?'rgba(255,255,255,.03)':'rgba(255,255,255,.015)';
     ctx.beginPath(); ctx.roundRect(c*GEM_SIZE+2,r*GEM_SIZE+2,GEM_SIZE-4,GEM_SIZE-4,8); ctx.fill();
@@ -501,7 +513,7 @@ function spawnRuneParticles(col,row,color){
   }
 }
 function updateParticles(){
-  pCtx.clearRect(0,0,W,H);
+  pCtx.clearRect(0,0,getW(),getH());
   particles=particles.filter(p=>p.alpha>.01);
   particles.forEach(p=>{
     p.x+=p.vx; p.y+=p.vy; p.vy+=p.gravity; p.vx*=.97; p.alpha-=p.decay;
@@ -517,8 +529,8 @@ function showPopup(col,row,text,color='#ffe066'){
   const el=document.createElement('div');
   el.className='score-popup'; el.textContent=text; el.style.color=color;
   const wr=wrapper.getBoundingClientRect();
-  el.style.left=(wr.left+col*GEM_SIZE*(wr.width/W)+GEM_SIZE*(wr.width/W)/2)+'px';
-  el.style.top=(wr.top+row*GEM_SIZE*(wr.height/H))+'px';
+  el.style.left=(wr.left+col*GEM_SIZE*(wr.width/getW())+GEM_SIZE*(wr.width/getW())/2)+'px';
+  el.style.top=(wr.top+row*GEM_SIZE*(wr.height/getH()))+'px';
   el.style.position='fixed'; el.style.transform='translateX(-50%)';
   document.body.appendChild(el); setTimeout(()=>el.remove(),1200);
 }
@@ -782,19 +794,110 @@ function shakeGem(r,c){
   },28);
 }
 
-// ── CLICK ─────────────────────────────────────────────────────────────────────
-canvas.addEventListener('click',e=>{
+// ── INPUT: SWIPE (touch) + DRAG (mouse) ─────────────────────────────────────
+// Works on both mobile (finger swipe) and desktop (click-drag).
+// The player presses/touches a gem and slides in any direction to swap.
+// A small movement threshold prevents accidental swaps from taps.
+
+const SWIPE_MIN = 12; // px on screen needed to count as a directional swipe
+let dragStart = null; // {row, col, x, y} where the press began
+
+function getBoardCell(clientX, clientY){
+  const rect = canvas.getBoundingClientRect();
+  const scaleX = getW() / rect.width;
+  const scaleY = getH() / rect.height;
+  const mx = (clientX - rect.left) * scaleX;
+  const my = (clientY - rect.top)  * scaleY;
+  const col = Math.floor(mx / GEM_SIZE);
+  const row = Math.floor(my / GEM_SIZE);
+  if(row<0||row>=ROWS||col<0||col>=COLS) return null;
+  return {row, col};
+}
+
+// ── TOUCH (mobile finger swipe) ──────────────────────────────────────────────
+canvas.addEventListener('touchstart', e=>{
   if(!gameActive||animating||questionActive||isPaused) return;
-  const rect=canvas.getBoundingClientRect();
-  const scaleX=W/rect.width, scaleY=H/rect.height;
-  const mx=(e.clientX-rect.left)*scaleX;
-  const my=(e.clientY-rect.top)*scaleY;
-  const col=Math.floor(mx/GEM_SIZE), row=Math.floor(my/GEM_SIZE);
-  if(row<0||row>=ROWS||col<0||col>=COLS||!board[row]?.[col]) return;
-  if(!selected) selected={row,col};
-  else if(selected.row===row&&selected.col===col) selected=null;
-  else trySwap(selected.row,selected.col,row,col);
+  e.preventDefault(); // stop scroll while playing
+  const t = e.changedTouches[0];
+  const cell = getBoardCell(t.clientX, t.clientY);
+  if(!cell) return;
+  dragStart = {...cell, x: t.clientX, y: t.clientY};
+}, {passive: false});
+
+canvas.addEventListener('touchend', e=>{
+  if(!gameActive||animating||questionActive||isPaused||!dragStart) return;
+  e.preventDefault();
+  const t = e.changedTouches[0];
+  const dx = t.clientX - dragStart.x;
+  const dy = t.clientY - dragStart.y;
+  const dist = Math.sqrt(dx*dx + dy*dy);
+
+  if(dist < SWIPE_MIN){
+    // Treat as a tap — highlight the gem (optional visual feedback)
+    selected = {row: dragStart.row, col: dragStart.col};
+    dragStart = null;
+    return;
+  }
+
+  // Determine swipe direction
+  const {row:r, col:c} = dragStart;
+  let nr = r, nc = c;
+  if(Math.abs(dx) >= Math.abs(dy)){
+    nc = dx > 0 ? c+1 : c-1; // horizontal
+  } else {
+    nr = dy > 0 ? r+1 : r-1; // vertical
+  }
+  dragStart = null;
+  selected = null;
+  if(nr>=0&&nr<ROWS&&nc>=0&&nc<COLS) trySwap(r,c,nr,nc);
+}, {passive: false});
+
+canvas.addEventListener('touchcancel', ()=>{ dragStart=null; }, {passive:true});
+
+// ── MOUSE (desktop drag or click) ────────────────────────────────────────────
+canvas.addEventListener('mousedown', e=>{
+  if(!gameActive||animating||questionActive||isPaused) return;
+  const cell = getBoardCell(e.clientX, e.clientY);
+  if(!cell) return;
+  dragStart = {...cell, x: e.clientX, y: e.clientY};
 });
+
+canvas.addEventListener('mouseup', e=>{
+  if(!gameActive||animating||questionActive||isPaused||!dragStart) return;
+  const dx = e.clientX - dragStart.x;
+  const dy = e.clientY - dragStart.y;
+  const dist = Math.sqrt(dx*dx + dy*dy);
+  const {row:r, col:c} = dragStart;
+
+  if(dist < SWIPE_MIN){
+    // Short click — use classic select-then-swap behaviour
+    const cell = getBoardCell(e.clientX, e.clientY);
+    if(!cell){ dragStart=null; return; }
+    if(!selected){
+      selected = {row:cell.row, col:cell.col};
+    } else if(selected.row===cell.row && selected.col===cell.col){
+      selected = null;
+    } else {
+      trySwap(selected.row, selected.col, cell.row, cell.col);
+      selected = null;
+    }
+    dragStart = null;
+    return;
+  }
+
+  // Drag in a direction — swap that way
+  let nr=r, nc=c;
+  if(Math.abs(dx) >= Math.abs(dy)){
+    nc = dx > 0 ? c+1 : c-1;
+  } else {
+    nr = dy > 0 ? r+1 : r-1;
+  }
+  dragStart = null;
+  selected = null;
+  if(nr>=0&&nr<ROWS&&nc>=0&&nc<COLS) trySwap(r,c,nr,nc);
+});
+
+window.addEventListener('mouseup', ()=>{ dragStart=null; }); // safety cleanup
 
 // Keyboard: Escape / P = pause
 document.addEventListener('keydown',e=>{
@@ -983,7 +1086,11 @@ function gameLoop(){
 }
 
 // ── BOOT ──────────────────────────────────────────────────────────────────────
-window.addEventListener('resize',()=>{ bgCanvas.width=window.innerWidth; bgCanvas.height=window.innerHeight; initStars(); });
+window.addEventListener('resize',()=>{
+  bgCanvas.width=window.innerWidth; bgCanvas.height=window.innerHeight;
+  resizeCanvas(); // recalculate GEM_SIZE so board fits new screen width
+  initStars();
+});
 buildTopicGrid();
 initStars();
 requestAnimationFrame(gameLoop);
