@@ -653,9 +653,19 @@ async function processMatches(){
         await askRuneQuestion(qd);
       }
     }
+
+    // Deadlock check after every refill — reshuffle silently if no moves exist
+    if(!hasValidMoves() && gameActive){
+      await reshuffleBoard();
+    }
   }
   if(chainDepth===0) combo=0;
   updateComboUI();
+
+  // Final deadlock check after entire chain settles
+  if(!hasValidMoves() && gameActive){
+    await reshuffleBoard();
+  }
 }
 
 // ── QUESTION SYSTEM ───────────────────────────────────────────────────────────
@@ -783,6 +793,12 @@ async function trySwap(r1,c1,r2,c2){
     await processMatches();
   }
   animating=false; resetHintTimer(); checkGameState();
+  // If board settled with no valid moves, reshuffle immediately
+  if(gameActive && !questionActive && !hasValidMoves()){
+    animating=true;
+    await reshuffleBoard();
+    animating=false;
+  }
 }
 
 function shakeGem(r,c){
@@ -952,6 +968,64 @@ function updateStats(){
   document.getElementById('stat-c').textContent=runesCorrect;
   document.getElementById('stat-a').textContent=runesAnswered>0?Math.round(runesCorrect/runesAnswered*100)+'%':'—';
   document.getElementById('stat-bc').textContent=bestCombo;
+}
+
+// ── DEADLOCK DETECTION & RESHUFFLE ───────────────────────────────────────────
+// Check if any swap on the board produces at least one match.
+function hasValidMoves(){
+  for(let r=0;r<ROWS;r++){
+    for(let c=0;c<COLS;c++){
+      for(const[nr,nc] of [[r-1,c],[r+1,c],[r,c-1],[r,c+1]]){
+        if(nr<0||nr>=ROWS||nc<0||nc>=COLS) continue;
+        // Temporarily swap
+        const tmp=board[r][c]; board[r][c]=board[nr][nc]; board[nr][nc]=tmp;
+        const ok=findMatches().size>0;
+        // Swap back
+        board[nr][nc]=board[r][c]; board[r][c]=tmp;
+        if(ok) return true;
+      }
+    }
+  }
+  return false;
+}
+
+// Reshuffle: scramble all non-rune gems in place until the board has valid moves.
+// Rune gems keep their position so the player doesn't lose quiz progress.
+// Score and moves are untouched — this is never the player's fault.
+async function reshuffleBoard(){
+  // Brief pause so it doesn't feel instant
+  await sleep(300);
+
+  // Flash message on the level strip area
+  const strip=document.getElementById('level-strip');
+  const orig=strip.innerHTML;
+  strip.innerHTML='<span style="color:#ffd700;letter-spacing:.12em;">✦ Reshuffling board… no moves left ✦</span>';
+
+  // Collect positions of non-rune gems
+  const positions=[];
+  const runes=[];
+  for(let r=0;r<ROWS;r++) for(let c=0;c<COLS;c++){
+    if(board[r][c]?.isRune) runes.push([r,c]);
+    else positions.push([r,c]);
+  }
+
+  // Keep shuffling until we get a valid board (max 50 attempts)
+  let attempts=0;
+  do {
+    // Fisher-Yates shuffle of the gem types at those positions
+    const types=positions.map(([r,c])=>board[r][c]?.type||randomType());
+    for(let i=types.length-1;i>0;i--){
+      const j=Math.floor(Math.random()*(i+1));
+      [types[i],types[j]]=[types[j],types[i]];
+    }
+    positions.forEach(([r,c],i)=>{
+      board[r][c]=makeGem(types[i],board[r][c]?.y??r*GEM_SIZE,r*GEM_SIZE);
+    });
+    attempts++;
+  } while(!hasValidMoves() && attempts<50);
+
+  await sleep(700);
+  strip.innerHTML=orig;
 }
 
 // ── HINT ──────────────────────────────────────────────────────────────────────
